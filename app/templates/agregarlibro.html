@@ -1,0 +1,69 @@
+{% extends "admin.html" %}
+  {% block content %}
+    <center><p id="los_errores"></p></center>
+
+      <div id="account">
+        <form name="registroL" method="POST" class="agLib" onsubmit="return validarLibro()" >
+
+          
+          <label>Titulo:</label>
+          <input type="text" name="titulo" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control"><br>
+          
+          <label> Descripcion:</label>
+          <input type="text" name="descripcion" style="margin: 0 auto;" class="col-lg-6 col-lg-offset-6; form-control"><br>
+          
+          <label>ISBN:</label>
+          <input type="number" name="ISBN" style="margin: 0 auto;" class="col-lg-2 col-lg-offset-2; form-control"><br>
+
+          <div>
+            <div class="form-group"> <!-- dropdown editorial -->
+              <label>Editorial</label>
+              <select id="editorial" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="editorial" title="Elige una editorial">
+                <option  selected="true" value="0" disabled>Elige una editorial</option>
+                {% for e in allEditoriales %}
+                
+                  <option value="{{e.id}}">{{e.nomEditorial}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>  <!-- fin dropdown editorial -->
+
+          <div> <!-- dropdown autor -->
+            <div class="form-group">
+              <label>Autor</label>
+              <select id="autor" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="autor" title="Elige un autor">
+                  <option selected="true" value="0" disabled>Elige un autor</option>
+                  {% for a in allAutores %}
+                  <option value="{{a.id}}">{{a.nomAutor}}</option>
+                  {% endfor %}
+              </select>
+            </div>
+          </div> <!-- fin dropdown autor -->
+
+          <div> <!-- dropdown genero -->
+            <div class="form-group">
+              <label>Genero</label>
+              <select id="genero" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="genero" title="Elige un genero">
+                <option selected="true" value="0" disabled>Elige un genero</option>
+                {% for g in allGeneros %}
+                <option value="{{g.id}}">{{g.nomGenero}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div> <!-- fin dropdown genero -->
+
+        <label>Fecha de edicion:</label> 
+        <input type="datetime" name="edicion" style="margin: 0 auto;" class="col-lg-2 col-lg-offset-2; form-control" placeholder="dd-mm-aaaa"><br>
+      
+        <label>Cantidad de capítulos:</label>
+        <input type="number" name="cantCap" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control"><br>
+
+
+      <div class="paddingP">
+      <button type="submit" class="btn btn-primary">Subir libro</button>
+      </div>
+      </div>
+       <center><p id="hay_errores"></p></center> 
+      </form>
+    </div>
+  {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %} Bookflix | Iniciar Sesión {% endblock %}
+{% block content %}
+
+<div id="login">
+
+	<h1>Iniciar Sesión</h1>
+
+	<form method="post" action="{{ url_for('login') }}">
+
+		<div class="form-group">
+      <label for="email">Correo electrónico </label>
+      <input type="text" class="form-control" placeholder="Correo Electronico" id="email" name="correo_login">
+    </div>
+		<div class="form-group">
+      <label for="pass">Contraseña </label>
+      <input type="password" class="form-control" placeholder="Clave" id="pass" name="password_login">
+    </div>
+
+		<button type="submit" class="btn btn-dark btn-lg"> <i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
+
+	</form>
+
+</div>
+
+{% endblock %}

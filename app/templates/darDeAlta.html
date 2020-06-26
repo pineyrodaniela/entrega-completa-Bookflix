@@ -1,0 +1,39 @@
+{% extends "admin.html" %}
+{% block content %}
+  <center><p id="los_errores"></p></center>
+  <div id="account">
+      <div>
+        <form name="edit" method="POST" class="agLib" onsubmit="return validarEditorial()" >
+          <label>Editorial:</label> 
+          <input name="editorial" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" type="text">
+          <div>    
+            <button type="submit" class="btn btn-primary">Agregar editorial</button>
+          </div>
+        </form>
+      </div>
+
+      <div>
+
+        <form style="margin-top: 10%; margin-bottom: 10%"  name="gen" method="POST" class="agLib" onsubmit="return validarGenero()" >
+          <label>Genero:</label> <input type="text" name="genero" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control">
+
+          <div>  
+            <button type="submit" class="btn btn-primary">Agregar genero</button>
+
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <form name="aut" method="POST" class="agLib" onsubmit="" >
+        <label>Autor:</label> 
+        <input type="text" name="autor" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control">
+          <div>  
+            <button type="submit" class="btn btn-primary">Agregar autor</button>
+          </div>
+        </form>
+      </div>
+  </div>
+{% endblock %}
+
+

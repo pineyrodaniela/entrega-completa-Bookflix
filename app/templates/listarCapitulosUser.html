@@ -1,0 +1,38 @@
+{% extends "NavBarUser.html" %}
+  {% block content %}
+
+       
+    
+    <div class="container">
+      <h1 style="text-align: center;">{{libro.titulo}}</h1>
+
+ <div class="row">
+ <div class="col-12">
+   <table class="table table-hover table-dark">
+     <thead>
+       <tr>
+         <th scope="col" style="text-align: center;">Titulo del capitulo</th>
+         <th scope="col" style="text-align: center;">Num. capitulo</th>
+         <th scope="col" style="text-align: center;">Acciones</th>
+       </tr>
+     </thead>
+     <tbody>
+       {% for c in capitulos %}
+       <tr style="background-color: #1D1B1C">
+         <td style="text-align: center;">{{c.nomCap}}</td>
+         <td style="text-align: center;">{{c.numCap}}</td>
+         <td style="text-align: center; width: 15%;">
+          {% if datetime_act < c.fecha_vencimiento %}
+          <a href="/verCapitulo/{{libro.id}}/{{c.numCap}}" class="btn btn-primary" role="button" ><i class="fas fa-eye"></i></a>    
+          {% else %}
+            capitulo vencido
+          {% endif %}
+         </td>
+       </tr>
+     {% endfor %}
+     </tbody>
+   </table>
+ </div>
+</div>
+</div>
+ {% endblock %}

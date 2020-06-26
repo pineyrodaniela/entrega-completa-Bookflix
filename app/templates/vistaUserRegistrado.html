@@ -1,0 +1,23 @@
+{% extends "NavBarUser.html" %}
+  {% block content %}
+  <table class="table table-hover table-dark">
+    <thead>
+      <tr>
+        <th scope="col" style="text-align: center;">Titulo</th>
+        <th scope="col" style="text-align: center;">Cantidad de capitulos</th>
+        <th scope="col" style="text-align: center;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in libros %}
+      <tr style="background-color: #1D1B1C">
+        <td style="text-align: center;">{{l.titulo}}</td>
+        <td style="text-align: center;">{{l.cantCapTotales}}</td>
+        <td style="text-align: center;">
+            <a href="/mostrarLibro/{{l.id}}" class="btn btn-info" role="button" ><i class="fa fa-eye"></i></a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endblock %}

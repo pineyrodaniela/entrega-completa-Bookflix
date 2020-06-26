@@ -1,0 +1,354 @@
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+#title {
+  color: #fff;
+  background-image: linear-gradient(to right, #211F1F, #000);
+  background-color: #0F0E0E;
+}
+
+p {
+  color: #FCCEC8;
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 3rem;
+  line-height: 1.5;
+}
+
+h2 {
+  font-size: 3rem;
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+h3 {
+  color: #FFEAE7;
+  font-weight: bold;
+  padding: 1.5rem 0;
+}
+
+.container-fluid {
+  padding: 3% 15% 2%;
+}
+
+/* Navigation Bar */
+.navbar {
+  padding: 0 0 4.5rem;
+}
+
+.navbar-brand {
+  font-family: 'Bebas Neue';
+  font-size: 2.5rem;
+}
+
+.navbar-dark .navbar-brand {
+  color: #E50914;
+}
+
+.navbar-dark .navbar-brand:hover {
+  color: #E50914;
+}
+
+.navbar-light .navbar-brand:visited {
+  color: #E50914;
+}
+
+.nav-item {
+  padding: 0 10px;
+}
+
+.nav-link {
+  font-size: 1rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Download Buttons */
+.download-button {
+  margin: 5% 3% 5% 0;
+}
+
+/* Title Image */
+.title-img {
+  width: 100%;
+  transform: rotate(25deg);
+  right: 7%;
+}
+
+/* Features Section */
+#features {
+  padding: 7% 15%;
+  background-color: #801336;
+}
+
+.feature-box {
+  text-align: center;
+  padding: 2%;
+}
+
+.icon {
+  color: #ef8172;
+}
+
+.icon:hover {
+  color: #fff;
+}
+
+/* Testimonials Section */
+#testimonials {
+  text-align: center;
+  background-color: #272121;
+  color: #BAA7A7;
+  padding: 100px 0;
+}
+
+.testimonial-img {
+  box-shadow: #BAA7A7 10px 10px;
+  border: 10px solid #fff;
+  width: 22%;
+  margin: 20px;
+}
+
+.carousel-item {
+  padding: 7% 15%;
+}
+
+/* Pricing Section */
+#pricing {
+  padding: 100px;
+  text-align: center;
+}
+
+#pricing h3, #pricing p {
+  color: #000;
+}
+
+.pricing-column {
+  padding: 3% 2%;
+}
+
+/* Call to Action Section */
+#cta {
+  color: #fff;
+  background-color: #0F0E0E;
+  padding: 7% 15%;
+  text-align: center;
+}
+
+#cta p, #cta h3 {
+  color: white;
+}
+
+.cta-heading {
+  font-weight: bold;
+  font-size: 3.5rem;
+  line-height: 1.5;
+}
+
+/* Footer Section */
+#footer {
+  padding: 0.5% 15%;
+  text-align: center;
+  background-image: linear-gradient(to right, #af0404, #640505);
+}
+
+#footer p {
+  color: #fff;
+}
+
+.social-icon {
+  color: #fff;
+  margin: 20px 10px;
+}
+
+/* Categorias de mensajes  */
+.success {
+  margin: 3%;
+  padding: 20px;
+  color: green;
+  text-align: center;
+  border: 1px solid green;
+}
+
+.error {
+  margin: 3%;
+  padding: 20px;
+  color: red;
+  text-align: center;
+  border: 1px solid red;
+}
+
+.success_login, .success_logout, .success_deleted_account {
+  margin: 1%;
+  padding: 7px;
+  color: green;
+  text-align: center;
+  border: 1px solid green;
+  font-weight: bold;
+}
+
+/* ---------------- */
+/* SignUp Section / SignUp Forms */
+#signup {
+  padding: 100px;
+}
+
+#signup h1, #signup h3 {
+  color: #000;
+  text-align: center;
+}
+
+#signup p {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+.asterix {
+  color: #000;
+  padding: 2% 0;
+  text-align: center;
+}
+
+/* LogIn Section */
+#login {
+  padding: 100px;
+  text-align: center;
+}
+
+/* Account Section */
+#account {
+  padding: 100px;
+  text-align: center;
+}
+
+#account p {
+  color: #000;
+}
+
+#account .warning {
+  color: red;
+}
+
+/* Perfiles */
+.perfiles {
+  padding: 2% 25%;
+}
+
+.feature-box-avatar-imgs {
+  text-align: center;
+}
+
+.avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin: 30px;
+}
+
+.eligeUnAvatar {
+  color: #000;
+}
+
+.agregarPerfil {
+  padding-bottom: 40px;
+}
+
+/* Media Queries */
+@media (max-width: 1028px) {
+  #title {
+    text-align: center;
+  }
+
+  .title-img {
+    transform: rotate(0);
+  }
+}
+
+@media (max-width: 991px) {
+  .title-img {
+    width: 60%;
+  }
+}
+
+.sidenav {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 1; 
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+/* Style the sidenav links and the dropdown button */
+.sidenav a, .dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+/* On mouse-over */
+.sidenav a:hover, .dropdown-btn:hover {
+  color: #f1f1f1;
+}
+
+/* Main content */
+.main {
+  margin-left: 200px;
+  /* Same as the width of the sidenav */
+  font-size: 20px;
+  /* Increased text to enable scrolling */
+  padding: 0px 10px;
+}
+
+/* Add an active class to the active dropdown button */
+.active {
+  background-color: green;
+  color: white;
+}
+
+/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+.dropdown-container {
+  display: none;
+  background-color: #262626;
+  padding-left: 8px;
+}
+
+/* Optional: Style the caret down icon */
+.fa-caret-down {
+  float: right;
+  padding-right: 8px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
+}
+
+.bodySideBar {
+  font-family: "Lato", sans-serif;
+}
+

@@ -1,0 +1,90 @@
+{% extends "admin.html" %}
+  {% block content %}
+  
+  <script>
+      $( document ).ready(function() {
+        $(".xd").click(function(){
+          id=$(this).attr("idLibro")
+          $("#"+id).modal();
+      });
+      });
+      
+  </script>
+    {% if allLibros|length %}
+        <h1 style="text-align: center;">Libros subidos</h1>
+      
+       <div class="container">
+    <div class="row">
+    <div class="col-12">
+      <table class="table table-hover table-dark">
+        <thead>
+          <tr>
+            <th scope="col" style="text-align: center;">Titulo</th>
+            <th scope="col" style="text-align: center;">ISBN</th>
+            <th scope="col" style="text-align: center;">Autor</th>
+            <th scope="col" style="text-align: center;">Cantidad de capitulos</th>
+            <th scope="col" style="text-align: center;">Cap. Subidos</th>
+            <th scope="col" style="text-align: center;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in allLibros %}
+              <div class="modal fade modalGenerico" id="{{l.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 style="color: #1D1B1C;" class="modal-title" id="exampleModalLongTitle">Estas seguro de borrar {{l.titulo}}?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div style="color: #1D1B1C;" class="modal-body">
+                      Esta acción no se puede deshacer
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                      <a href="/borrarLibro/{{l.id}}" nomLibro="{{l.titulo}}"idLibro ="{{l.id}}" class="btn btn-danger" role="button" >Borrar libro</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          <tr style="background-color: #1D1B1C">
+            <td style="text-align: center;">{{l.titulo}}</td>
+            <td style="text-align: center;">{{l.ISBN}}</td>
+            <td style="text-align: center;">{{allAutores[l.autor_id-1].nomAutor}}</td>
+            <td style="text-align: center;">{{l.cantCapTotales}}</td>
+              {% if (l.cantCapTotales == l.capSubidosAct) %}
+                    <td style="text-align: center;" >Libro completado</td>
+              {% else %}
+                <td style="text-align: center;">{{l.capSubidosAct}}</td>
+              {% endif %}
+            </td>
+            <td style="text-align: center; width: 25%;">
+              {% if (l.cantCapTotales == 1) and  (l.cantCapTotales != l.capSubidosAct) %}
+                <a href="/subirLibroCompleto/{{l.id}}" class="btn btn-primary" role="button" ><i class="fa fa-upload"></i></a>
+              {% elif l.cantCapTotales > 1 and  (l.cantCapTotales != l.capSubidosAct) %}
+                <a href="/subirCapitulo/{{l.id}}" class="btn btn-primary" role="button" ><i class="fa fa-upload"></i></a>
+              {% endif %}
+              {% if (l.cantCapTotales != 0) %}
+              <a href="/mostrarCapitulos/{{l.id}}" class="btn btn-info" role="button" ><i class="fa fa-bars"></i></a>
+              {% endif %}
+              <a href="modificarLibro/{{l.id}}" class="btn btn-success" role="button" ><i class="fas fa-edit"></i></a>
+              <a id="borrarL" idLibro ="{{l.id}}" class="btn btn-danger xd" role="button" ><i class="far fa-trash-alt"></i></a>
+              <a href="agregarTrailerLibro/{{l.id}}">
+                <button type="button" class="btn btn-secondary"><i class="fa fa-camera-retro fa"></i></button></a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+    {% else %}
+      <h1 style="text-align: center;">Sin libros</h1>
+    {%endif%}
+    {% endblock %}
+
+    
+        
+

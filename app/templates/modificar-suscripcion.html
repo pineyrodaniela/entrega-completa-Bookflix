@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %} Cambia de plan {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1 style="padding-bottom: 20px;">Cambia el plan de tu cuenta</h1>
+
+  {% if membresia == 1 %}
+    <h4><mark>Cambia a Premium</mark></h4>
+
+    <p><mark>Es una buena elección</mark></p>
+    <br>
+    <blockquote class="blockquote">
+      El plan <strong>Premium</strong> permite que puedas disfrutar de Bookflix con hasta 4 perfiles dentro de tu cuenta. <br>
+      ¿Qué esperas para cambiarte de plan ahora?
+    </blockquote>
+    <br>
+    <div class="card">
+      <div class="card-body">
+        <p>Paga <strong>$500</strong> para completar la cuota anual</p>
+        <hr>
+        <p>Conviértete en usuario Premium al instante</p>
+        <p>* Se utilizarán los datos de la tarjeta de la cuenta para completar el pago</p>
+        <hr>
+        <form method="post" action="{{ url_for('modificar_suscripcion') }}">
+          <center><button type="submit" class="btn btn-success btn-lg">Pagar y cambiar plan</button></center>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+
+  {% if membresia == 2 %}
+    <h4><mark>Cambia a Standard</mark></h4>
+    {% if cantidadPerfiles > 2 %}
+      <div class="card">
+        <div class="card-body">
+          <p>El límite de perfiles máximo permitido para un usuario Standard es de 2 perfiles, actualmente en tu cuenta hay más de 2 perfiles</p>
+          <p><a href="{{ url_for('borrar_perfil') }}">Borrar perfiles</a></p>
+        </div>
+      </div>
+    {% endif %}
+    {% if cantidadPerfiles <= 2 %}
+      <blockquote class="blockquote">
+        El plan <strong>Standard</strong> permite que puedas disfrutar de Bookflix con hasta 2 perfiles dentro de tu cuenta. <br>
+        Puedes cambiar de plan ahora
+      </blockquote>
+      <br>
+      <div class="card">
+        <div class="card-body">
+          <p>Conviértete en usuario Standard al instante</p>
+          <hr>
+          <p>A partir de la próxima facturación, se cobrará el saldo perteneciente a usuarios Standard ($499)</p>
+          <form method="post" action="{{ url_for('modificar_suscripcion') }}">
+            <center><button type="submit" class="btn btn-success btn-lg">Cambiar plan ahora</button></center>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+
+
+</section>
+
+{% endblock %}

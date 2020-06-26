@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>fecha del libro: {{fecL}}</h1><br><br><br>
+    <h1>fecha actual: {{datetime_act}}</h1><br><br><br>
+    {% if fecL < datetime_act %}
+        <h1>expirado</h1>
+    {% else %}
+        <h1>no expiró</h1>
+    {% endif %}
+
+</body>
+</html>

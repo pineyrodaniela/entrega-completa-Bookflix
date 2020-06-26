@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %} Cerrar Cuenta {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1>Cerrar cuenta de usuario</h1>
+
+  <p>
+    ¿Estas seguro de que quieres cerrar tu cuenta de forma permanente? No podrás recuperar los datos de tu cuenta. Esta acción no tiene vuelta atrás.
+  </p>
+
+  <form method="get" action="{{ url_for('borrar_def') }}">
+    <center><button type="submit" class="btn btn-danger btn-lg">Cerrar</button></center>
+  </form>
+
+  <br />
+
+  <center> <a class="btn btn-success btn-lg" href="{{ url_for('account') }}" role="button">Volver</a>
+  </center>
+
+
+</section>
+
+{% endblock %}

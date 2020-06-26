@@ -1,0 +1,42 @@
+{% extends "NavBarUser.html" %}
+
+
+{% block content %}
+<section id="title">
+    <div class="container">
+    <h2 style="text-align: center;">Titulo: {{l.titulo}}</h2>
+    <h5>Descripcion: {{l.descripcion}}</h5>
+
+    <div style="display: flex;">
+        <div><img style="display: flex; width:200px;
+            height: auto;" src="{{l.pathPortada}}" >
+        </div>
+        <div style="margin-left: 3%; margin-top:8% ;" >
+            <h6>Genero: {{gen.nomGenero}}</h6><br>
+            <h6>Autor: {{aut.nomAutor}}</h6><br>
+            <h6>Editorial: {{edit.nomEditorial}}</h6><br>
+            <h6>Cantidad de paginas: {{c.cantidad_de_paginas}}</h6>
+        </div>
+    </div>
+    <div class="container" style="text-align: center; margin-top: 3%;">
+    <div>
+    {% if l.capSubidosAct == 0 %}
+    <a type="button" class="btn btn-primary btn-lg">Proximamente</a>
+    {% elif datetime_act > c.fecha_vencimiento %}
+    <a type="button" class="btn btn-primary btn-lg">Libro vencido</a>
+    {% endif %}
+    {% if l.capSubidosAct == 1 and datetime_act < c.fecha_vencimiento%}
+        <a href="/verPDF/{{l.id}}" type="button" class="btn btn-primary btn-lg">Ver libro</a>
+    {% elif l.capSubidosAct > 1 %}
+    <a href="/listarCapitulosUser/{{l.id}}" type="button" class="btn btn-primary btn-lg">Elegir capitulo</a></br>
+    {% endif %}
+    {% if trailerL %}
+    <form action="/trailersU" method="POST">
+        <input  type="hidden" name="nombre" value="{{trailerL.nombre}}">
+        <input type="submit" class="btn btn-secondary btn-lg" value="Ver trailer">
+        </form>
+    {% endif %}
+    </div><br> 
+    </div>
+</section>
+{% endblock %}

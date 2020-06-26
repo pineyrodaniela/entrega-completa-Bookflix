@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_render_elements.html" import render_messages %}
+{% from "_render_elements.html" import render_input %}
+
+
+{% block content %}
+
+<body>
+
+  <section id="pricing">
+    <div class="container-fluid">
+
+<div class="content">
+	<h1 style="text-align: left;">Novedades</h1>
+  <table class="table">
+    <tr>
+    <th><a>Titulo:</a></th>
+    <th><a>Descripción:</a></th>
+  </tr>
+  <tr>
+    <td><h5>{{ noticia.title }}</h5></td>
+    <td><h5>{{ noticia.content }}</h5></td>
+  </tr>
+    </table>
+</div>
+    </div>
+  </section>
+</body>
+{% endblock %}

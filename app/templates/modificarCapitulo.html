@@ -1,0 +1,23 @@
+{% extends "admin.html" %}
+  {% block content %}
+  <center><p id="los_errores"></p></center>
+
+  <div id="account">
+    <h3>{{libro.titulo}} - {{capitulo.nomCap}}</h3>
+
+    <form name="modCap" method="post" class="agLib" onsubmit="validarModCapitulo()" >
+
+        <label>Cantidad de paginas:</label>
+        <input type="number" name="cantPags" style="margin: 0 auto;" value="{{capitulo.cantidad_de_paginas}}" class="col-lg-2 col-lg-offset-2; form-control"><br>
+        
+        <label>Fecha de vencimiento</label>
+        <input type="datetime" name="fec_ven" style="margin: 0 auto;" value="{{capitulo.fecha_vencimiento}}" class="col-lg-2 col-lg-offset-2; form-control"><br>
+        <div class="paddingP">
+          <button type="submit" class="btn btn-primary">Modificar capitulo</button>
+        </div>
+
+    </form>
+
+
+
+  {% endblock %}

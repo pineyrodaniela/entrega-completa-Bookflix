@@ -1,0 +1,35 @@
+{% extends "NavBarUser.html" %}
+{% block title %} Mis perfiles {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1>Mis perfiles</h1>
+
+  <div class="perfiles">
+
+    {% for perfil_dict in perfiles %}
+      {% for key, value in perfil_dict.items() %}
+
+        {% if key == "profile_img" %}
+          <img src="{{value}}" alt="Avatar" class="avatar">
+        {% endif %}
+
+        {% if key != "profile_img" %}
+          <p>{{value}}</p>
+        {% endif %}
+
+      {% endfor %}
+      <hr />
+    {% endfor %}
+
+  </div>
+
+  <a class="btn btn-outline-info btn-sm" href="{{ url_for('agregar_perfil') }}" role="button"><i class="fas fa-plus"></i> Añadir perfil</a>
+  <br>
+  <br>
+  <a class="btn btn-success btn-md" href="{{ url_for('administrar_perfiles') }}" role="button"><i class="fas fa-pencil-alt"></i> Administrar perfiles</a>
+
+</section>
+
+{% endblock %}

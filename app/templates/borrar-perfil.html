@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %} Borrar un perfil {% endblock %}
+
+{% block content %}
+
+<section id="account">
+
+  <h1>Elimina un perfil de tu cuenta</h1>
+
+  {% if cantidadPerfiles == 1 %}
+    <p> <mark>Debes tener por lo menos un perfil en la cuenta.</mark> </p>
+  {% endif %}
+  {% if cantidadPerfiles != 1 %}
+
+    <form name="borrar_profile" method="post" action="{{ url_for('borrar_perfil') }}" onsubmit="return confirmarBorrarPerfil()">
+
+      <div class="form-group">
+        <label for="perfil_para_borrar">Selecciona el perfil que quieres borrar </label>
+        <select id="perfil_para_borrar" class="form-control" name="perfil_borrado" title="Elige un perfil">
+          {% for perfil_dict in perfiles %}
+            {% for key, value in perfil_dict.items() %}
+              <option value="{{value[1]}}">{{value[0]}}</option>
+            {% endfor %}
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-danger btn-lg">Borrar</button>
+
+    </form>
+
+    <br>
+    <center> <a class="btn btn-success btn-lg" href="{{ url_for('perfiles') }}" role="button">Volver</a>
+    </center>
+
+  {% endif %}
+
+</section>
+
+{% endblock %}

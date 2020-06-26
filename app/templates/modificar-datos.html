@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %} Modificar mis datos {% endblock %}
+
+{% block content %}
+
+<section id="signup">
+
+  <h1>Modifica los datos personales de tu cuenta</h1>
+
+  <p id="los_errores"></p>
+
+  <form name="modificar_datos_personales" method="post" action="{{ url_for('modificarDatosPersonales') }}" onsubmit="return validarModificacion()">
+
+    <div class="form-group">
+      <label for="nmb">Nombre </label>
+      <input type="text" class="form-control" value="{{usuario.nombre}}" id="nmb" name="nombre" autofocus>
+    </div>
+    <div class="form-group">
+      <label for="apll">Apellido </label>
+      <input type="text" class="form-control" value="{{usuario.apellido}}" id="apll" name="apellido">
+    </div>
+    <div class="form-group">
+      <label for="mail">Correo Electrónico </label>
+      <input type="email" class="form-control" id="mail" value="{{usuario.correo}}" name="correo" disabled>
+      <small id="emailHelp" class="form-text text-muted">El correo electrónico no se puede modificar.</small>
+    </div>
+    <div class="form-group">
+      <label for="fechNac">Fecha de Nacimiento </label>
+      <input type="date" class="form-control" value="{{usuario.fecha_nac}}" id="fechNac" name="nacimiento">
+    </div>
+    <div class="form-group">
+      <label for="contrasenia1">Clave </label>
+      <input type="password" class="form-control" id="contrasenia1" value="{{usuario.clave}}" name="password1">
+    </div>
+    <div class="form-group">
+      <label for="contrasenia2">Repetir Clave </label>
+      <input type="password" class="form-control" id="contrasenia2" value="{{usuario.clave}}" name="password2">
+    </div>
+
+    <!-- Formulario para pagar con tarjeta -->
+    <h3> Datos de la tarjeta de crédito </h3>
+
+    <div class="form-group">
+      <label for="dni_titular">DNI </label>
+      <input type="number" class="form-control" value={{usuario.dni_titular_tarjeta}} id="dni_titular" name="titularTarj">
+    </div>
+    <div class="form-group">
+      <label for="tipo_tarjeta">Elige el tipo de tarjeta </label>
+      <select class="form-control" id="tipo_tarjeta" name="tipos_tarj">
+        <option value="{{usuario.tipo_tarjeta}}" selected>{{usuario.tipo_tarjeta}}</option>
+        <option value="credito">Tarjeta de Crédito</option>
+        <option value="debito">Tarjeta de Débito</option>
+        <option value="AmericanExpress">American Express</option>
+        <option value="Mastercard">MasterCard</option>
+        <option value="Visa">Visa</option>
+        <option value="Cabal">Cabal</option>
+        <option value="TarjetaNaranja">Tarjeta Naranja</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="nro_tarjeta">Número de Tarjeta </label>
+      <input type="number" class="form-control" value="{{usuario.num_tarjeta}}" id="nro_tarjeta" name="numero_de_tarjeta">
+      <small id="nroHelpBlock" class="form-text text-muted">
+        El número de tarjeta ingresado debe poseer 16 dígitos.
+      </small>
+    </div>
+    <div class="form-group">
+      <label for="ttlar">Titular </label>
+      <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control" value="{{usuario.titular_tarjeta}}" id="ttlar" name="nombre_titular_tarjeta">
+    </div>
+    <div class="form-group">
+      <label for="cvc">CVC  </label>
+      <input type="number" class="form-control" value="{{usuario.cvc}}" id="cvc" name="cvc_tarj">
+      <small id="cvcHelpBlock" class="form-text text-muted">
+        En la mayoría de las tarjetas (Visa, MasterCard, tarjetas bancarias, etc.) corresponde a los tres últimos dígitos del número impreso en el espacio reservado para la firma, en el reverso de la tarjeta.
+      </small>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="mes_venc">Mes de Vencimiento </label>
+          <select id="mes_venc" class="form-control" name="exMonth" title="Elige un Mes">
+            <option value="{{usuario.mes_venc}}" selected>{{usuario.mes_venc}}</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <label for="anio_venc">Año de vencimiento </label>
+          <select id="anio_venc" class="form-control" name="exYear" title="Selecciona un año">
+            <option value="{{usuario.anio_venc}}" selected>{{usuario.anio_venc}}</option>
+            <option value="2019">2019</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+            <option value="2031">2031</option>
+            <option value="2032">2032</option>
+            <option value="2033">2033</option>
+            <option value="2034">2034</option>
+            <option value="2035">2035</option>
+            <option value="2036">2036</option>
+            <option value="2037">2037</option>
+            <option value="2038">2038</option>
+            <option value="2039">2039</option>
+            <option value="2040">2040</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-------------------------------->
+
+    <center><button type="submit" class="btn btn-success btn-lg">Aplicar los Cambios</button></center>
+    <p id="hay_errores"></p>
+
+  </form>
+
+  <center><a class="btn btn-outline-primary btn-lg" href="{{ url_for('account') }}" role="button">Volver</a></center>
+
+</section>
+
+{% endblock %}

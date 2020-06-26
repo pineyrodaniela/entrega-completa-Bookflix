@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %} Administración de perfiles de la cuenta {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1>Administrar los perfiles</h1>
+
+  <p><strong>Selecciona una opción</strong></p>
+
+  <p>
+    <a href="{{ url_for('borrar_perfil') }}">Borrar un perfil</a>
+  </p>
+
+
+</section>
+
+{% endblock %}

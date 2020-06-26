@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %} Añadir un nuevo perfil {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1 class="agregarPerfil">Agregar Perfil</h1>
+
+  <!-- Standard -->
+  {% if membresia == 1 %}
+    {% if cantidadPerfiles == 2 %}
+      <p> <mark>Ha llegado al límite máximo de perfiles permitidos para la membresía a la que se encuentra suscripto</mark> </p>
+      <p> Membresía actual: <em>Standard</em> </p>
+      <a class="btn btn-success btn-md" href="{{ url_for('modificar_suscripcion') }}" role="button"><i class="fas fa-award"></i> Modificar suscripción</a>
+    {% endif %}
+    {% if cantidadPerfiles != 2 %}
+
+      <p id="los_errores" style="color: red; font-weight: bold;"></p>
+
+      <form name="agregar_profile" method="post" action="{{ url_for('agregar_perfil') }}" onsubmit="return validarNuevoPerfil()">
+
+    		<div class="form-group">
+          <label for="nombre_perf">Nombre  (*) </label>
+          <input type="text" class="form-control" placeholder="Nombre de tu nuevo perfil" id="nombre_perf" name="profile_name">
+        </div>
+
+        <!-- Formulario para elegir el avatar -->
+        <h3 class="eligeUnAvatar"> Elige un avatar </h3>
+
+        <!-- Lista de Avatares como imagenes -->
+        <div class="row">
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarBorges.png" alt="Avatar" class="avatar">
+            <h5>Jorge Luis Borges</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarCortazar.png" alt="Avatar" class="avatar">
+            <h5>Julio Cortázar</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarRowling.png" alt="Avatar" class="avatar">
+            <h5>J. K. Rowling</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarStephen.png" alt="Avatar" class="avatar">
+            <h5>Stephen King</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarHemingway.png" alt="Avatar" class="avatar">
+            <h5>Ernest Hemingway</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarMarquez.png" alt="Avatar" class="avatar">
+            <h5>Gabriel García Márquez</h5>
+          </div>
+        </div>
+
+        <br  />
+        <br  />
+
+    		<div class="form-group">
+          <label for="imagen_perf">Selecciona un avatar (*) </label>
+          <select id="avatar_de_perfil" class="form-control" name="profile_avatar" title="Elige un Avatar">
+            <option value="../static/imgs/avataresPerfil/avatarBorges.png">Jorge Luis Borges</option>
+            <option value="../static/imgs/avataresPerfil/avatarCortazar.png">Julio Cortázar</option>
+            <option value="../static/imgs/avataresPerfil/avatarRowling.png">J. K. Rowling</option>
+            <option value="../static/imgs/avataresPerfil/avatarStephen.png">Stephen King</option>
+            <option value="../static/imgs/avataresPerfil/avatarHemingway.png">Ernest Hemingway</option>
+            <option value="../static/imgs/avataresPerfil/avatarMarquez.png">Gabriel García Márquez</option>
+          </select>
+        </div>
+
+    		<button type="submit" class="btn btn-success btn-lg">Agregar</button>
+        <p id="hay_errores" style="color: red; font-weight: bold;"></p>
+
+    	</form>
+    {% endif %}
+  {% endif %}
+
+  <!-- Premium -->
+  {% if membresia == 2 %}
+    {% if cantidadPerfiles == 4 %}
+      <p> <mark>Ha llegado al límite máximo de perfiles permitidos para la membresía a la que se encuentra suscripto</mark> </p>
+      <p> Membresía actual: <em>Premium</em> </p>
+    {% endif %}
+    {% if cantidadPerfiles != 4 %}
+
+      <p id="los_errores" style="color: red; font-weight: bold;"></p>
+
+      <form name="agregar_profile" method="post" action="{{ url_for('agregar_perfil') }}" onsubmit="return validarNuevoPerfil_premium()">
+
+        <div class="form-group">
+          <label for="nombre_perf">Nombre  (*) </label>
+          <input type="text" class="form-control" placeholder="Nombre de tu nuevo perfil" id="nombre_perf" name="profile_name">
+        </div>
+
+        <!-- Formulario para elegir el avatar -->
+        <h3 class="eligeUnAvatar"> Elige un avatar </h3>
+
+        <!-- Lista de Avatares como imagenes -->
+        <div class="row">
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarBorges.png" alt="Avatar" class="avatar">
+            <h5>Jorge Luis Borges</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarCortazar.png" alt="Avatar" class="avatar">
+            <h5>Julio Cortázar</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarRowling.png" alt="Avatar" class="avatar">
+            <h5>J. K. Rowling</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarStephen.png" alt="Avatar" class="avatar">
+            <h5>Stephen King</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarHemingway.png" alt="Avatar" class="avatar">
+            <h5>Ernest Hemingway</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarMarquez.png" alt="Avatar" class="avatar">
+            <h5>Gabriel García Márquez</h5>
+          </div>
+        </div>
+
+        <br  />
+        <br  />
+
+        <div class="form-group">
+          <label for="imagen_perf">Selecciona un avatar (*) </label>
+          <select id="avatar_de_perfil" class="form-control" name="profile_avatar" title="Elige un Avatar">
+            <option value="../static/imgs/avataresPerfil/avatarBorges.png">Jorge Luis Borges</option>
+            <option value="../static/imgs/avataresPerfil/avatarCortazar.png">Julio Cortázar</option>
+            <option value="../static/imgs/avataresPerfil/avatarRowling.png">J. K. Rowling</option>
+            <option value="../static/imgs/avataresPerfil/avatarStephen.png">Stephen King</option>
+            <option value="../static/imgs/avataresPerfil/avatarHemingway.png">Ernest Hemingway</option>
+            <option value="../static/imgs/avataresPerfil/avatarMarquez.png">Gabriel García Márquez</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg">Agregar</button>
+        <p id="hay_errores" style="color: red; font-weight: bold;"></p>
+
+      </form>
+    {% endif %}
+  {% endif %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "admin.html" %}
+  {% block content %}
+    <center><p id="los_errores"></p></center>
+
+      <div id="account">
+        <form name="registroL" method="POST" class="agLib" onsubmit="validarLibro2()" >
+
+          <label> Descripcion:</label>
+          <input type="text" name="descripcion" style="margin: 0 auto;" class="col-lg-6 col-lg-offset-6; form-control" value="{{ libroMod.descripcion}}"><br>
+          
+          <label>ISBN:</label>
+          <input type="number" name="ISBN" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" value="{{ libroMod.ISBN}}"><br>
+
+          <div>
+            <div class="form-group">
+              <label>Editorial</label>
+              <select id="editorial" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="editorial" title="Elige una editorial">
+                <option value="0" disabled>Elige una editorial</option>
+                {% for e in allEditoriales %}
+                  {% if e.id == libroMod.editorial_id %}
+                    <option selected="true" value="{{e.id}}">{{e.nomEditorial}}</option>
+                  {% else %}
+                  <option value="{{e.id}}">{{e.nomEditorial}}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+    
+          <div>
+            <div class="form-group">
+              <label>Autor</label>
+              <select id="autor" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="autor" title="Elige un autor">
+                  <option selected="true" value="0" disabled>Elige un autor</option>
+                  {% for a in allAutores %}
+                    {% if a.id == libroMod.autor_id %}
+                      <option selected="true" value="{{a.id}}">{{a.nomAutor}}</option>
+                    {% else %}
+                      <option value="{{a.id}}">{{a.nomAutor}}</option>
+                    {% endif %}
+                  {% endfor %}
+              </select>
+            </div>
+          </div>
+    
+          <div>
+            <div class="form-group">
+              <label>Genero</label>
+              <select id="genero" style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="genero" title="Elige un genero">
+                <option selected="true" value="0" disabled>Elige un genero</option>
+                {% for g in allGeneros %}
+                  {% if g.id == libroMod.genero_id %}
+                    <option selected="true" value="{{g.id}}">{{g.nomGenero}}</option>
+                  {% else %}
+                    <option value="{{g.id}}">{{g.nomGenero}}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+        <label>Fecha de edicion:</label> 
+        <input type="datetime" name="edicion" style="margin: 0 auto;" class="col-lg-2 col-lg-offset-2; form-control" placeholder="dd-mm-aaaa" value="{{ libroMod.fecha_edicion}}"><br>
+      
+      <div class="paddingP">
+      <button type="submit" class="btn btn-primary">Subir libro</button>
+      </div>
+      </div>
+       <center><p id="hay_errores"></p></center> 
+      </form>
+    </div>
+  {% endblock %}

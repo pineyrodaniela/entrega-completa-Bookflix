@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_render_elements.html" import render_messages %}
+{% from "_render_elements.html" import render_input %}
+
+
+{% block content %}
+<body>
+
+<section id="pricing"> 
+<div class="content">
+	<h1 style="text-align: left;">Novedades</h1>
+	<table class="table">
+<tr>
+    <th>Titulo</th>
+    <th>Descripcion</th>
+    <th></th>
+</tr>
+{% for novedad in nove %}
+<tr>
+    <td>{{ novedad.title }}</td>
+    <td>{{ novedad.content }}</td>
+    <td><form action="/noticia/{{novedad.id}}" method="POST">
+        <input type="submit" value="Leer">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+    </table>
+</div>
+    </div>
+  </section>
+</body>
+{% endblock %}

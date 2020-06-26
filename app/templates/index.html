@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %} Bookflix | Lee libros, sin límites {% endblock %}
+{% block content %}
+
+
+  <!-- Features -->
+
+  <section id="features">
+      <h2>Algunos de nuestros libros</h2>
+    <div class="row">
+      {% for libros in a %}
+      <div class="feature-box col-lg-3">
+        <i class="fas fa-bullseye fa-4x icon"></i>
+        <a href="/signup"><h3>{{libros.titulo}}</h3></a>
+         
+      </div>
+      {% endfor %}
+   
+
+  </section>
+  
+ <!-- Call to Action -->
+
+ <section id="cta">
+
+  <h3 class="cta-heading">Comienza a leer, donde sea que estés. Ahora.</h3>
+  <a class="btn btn-outline-danger btn-lg download-button" href="/signup" role="button"><i class="fas fa-book-reader"></i> Únete ahora</a>
+  <p>
+     O si ya tienes una cuenta...
+  </p>
+  <a class="btn btn-outline-light btn-lg download-button" href="/login" role="button"><i class="fas fa-sign-in-alt"></i> Inicia Sesión</a>
+
+</section>
+  <!-- Pricing -->
+
+  <section id="pricing">
+
+    <h2>Elige un plan de lectura</h2>
+    <p>El plan más adecuado para ti está esperándote</p>
+
+    <div class="row">
+
+      <div class="pricing-column col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>Standard</h3>
+          </div>
+          <div class="card-body">
+            <h2>$499 / año</h2>
+            <p>Hasta <strong>2 perfiles</strong> en tu cuenta</p>
+            <p>Un pago anual</p>
+            <a class="btn btn-outline-dark btn-lg btn-block" href="/signup/standard" role="button">Elegir</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-column col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>Premium</h3>
+          </div>
+          <div class="card-body">
+            <h2>$999 / año</h2>
+            <p>¡Disfruta Bookflix al máximo con <strong>hasta 4 perfiles</strong> en tu cuenta!</p>
+            <p>Un pago anual</p>
+            <a class="btn btn-warning btn-lg btn-block" href="/signup/premium" role="button">Elegir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </section>
+
+
+ 
+
+{% endblock %}

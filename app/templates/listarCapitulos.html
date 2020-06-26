@@ -1,0 +1,42 @@
+{% extends "admin.html" %}
+  {% block content %}
+
+    <h1 style="text-align: center;">{{libro.titulo}}</h1>
+       
+    
+    <div class="container">
+ <div class="row">
+ <div class="col-12">
+   <table class="table table-hover table-dark">
+     <thead>
+       <tr>
+         <th scope="col" style="text-align: center;">Titulo del capitulo</th>
+         <th scope="col" style="text-align: center;">Num. capitulo</th>
+         <th scope="col" style="text-align: center;">Acciones</th>
+       </tr>
+     </thead>
+     <tbody>
+       {% for c in capitulo %}
+       <tr style="background-color: #1D1B1C">
+         <td style="text-align: center;">{{c.nomCap}}</td>
+         <td style="text-align: center;">{{c.numCap}}</td>
+         <td style="text-align: center; width: 15%;">
+            {% if libro.cantCapTotales == 1 and libro.capSubidosAct == 1 %}
+              <a href="/modificarCapitulo/{{libro.id}}/{{c.id}}" class="btn btn-primary" role="button" ><i class="fas fa-edit"></i></a>
+              <a href="/borrarCapituloLibCompleto/{{libro.id}}/{{c.id}}" class="btn btn-danger" role="button" ><i class="fas fa-trash"></i></a>            
+            {% endif %}
+            {% if libro.cantCapTotales > 1 and  c.numCap == libro.capSubidosAct %}
+              <a href="/modificarCapitulo/{{libro.id}}/{{c.id}}" class="btn btn-primary" role="button" ><i class="fas fa-edit"></i></a>
+              <a href="/borrarCapitulo/{{libro.id}}/{{c.id}}" class="btn btn-danger" role="button" ><i class="fas fa-trash"></i></a>   
+            {% elif libro.cantCapTotales > 1 %}
+            <a href="/modificarCapitulo/{{libro.id}}/{{c.id}}" class="btn btn-primary" role="button" ><i class="fas fa-edit"></i></a>
+            {% endif %}
+         </td>
+       </tr>
+     {% endfor %}
+     </tbody>
+   </table>
+ </div>
+</div>
+</div>
+ {% endblock %}

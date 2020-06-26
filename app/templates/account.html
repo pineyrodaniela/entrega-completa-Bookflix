@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %} Ver Cuenta {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1>Mi cuenta</h1>
+  <p><strong>Selecciona una opción</strong></p>
+
+  <p>
+    <a href="{{ url_for('perfiles') }}">Ver perfiles de mi cuenta</a>
+  </p>
+
+  <p>
+    <a href="{{ url_for('modificar_suscripcion') }}">Modificar Plan de Suscripción</a>
+  </p>
+
+  <p>
+    <a href="{{ url_for('modificarDatosPersonales') }}">Modificar datos personales</a>
+  </p>
+
+  <p>
+    <a class="warning" href="{{ url_for('delete_acc') }}">Cerrar cuenta</a>
+  </p>
+
+  <p>
+    <em>Fecha y hora del último acceso a la cuenta: {{infoDeAcceso}} </em>
+    </p>
+
+</section>
+
+{% endblock %}

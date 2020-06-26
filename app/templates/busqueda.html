@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="pricing">
+<div class="content">
+{% if libro != None and autor == None and genero == None %}
+<table class="table">
+    <tr>
+        <th>Titulo</th>
+        <th>Descripcion</th>
+        <th>Cantidad de páginas</th>
+    </tr>
+    {% for libro in libro %}
+    <tr>
+        <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
+        <td>{{ libro.descripcion }}</td>
+        <td>{{ libro.cantidad_de_paginas }}</td>
+    </tr>
+    {% endfor %}
+        </table>
+{% endif %}        
+
+       {% if autor != None %} 
+        <table class="table">
+            <tr>
+                <th>Autor</th>
+                <th>Titulo</th>
+                <th>Descripcion</th>
+                <th>Cantidad de páginas</th>
+            </tr>
+            {% for libro in librosAut %}
+            <tr>
+                <td>{{ autor.nomAutor }}</td>
+                <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
+                <td>{{ libro.descripcion }}</td>
+                <td>{{ libro.cantidad_de_paginas}}</td>
+            </tr>
+            {% endfor %}
+                </table>
+        {% endif %}
+
+        {% if genero != None and autor == None %} 
+        <table class="table">
+            <tr>
+                <th>Genero</th>
+                <th>Titulo</th>
+                <th>Descripcion</th>
+                <th>Cantidad de páginas</th>
+            </tr>
+            {% for libro in librosGen %}
+            <tr>
+                <td>{{ genero.nomGenero }}</td>
+                <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
+                <td>{{ libro.descripcion }}</td>
+                <td>{{ libro.cantidad_de_paginas}}</td>
+            </tr>
+            {% endfor %}
+                </table>
+        {% endif %} 
+    </div>
+      </section>
+    </body>
+
+
+
+{% endblock %}

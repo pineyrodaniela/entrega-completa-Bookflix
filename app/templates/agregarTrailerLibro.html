@@ -1,0 +1,10 @@
+{% extends "admin.html" %}
+  {% block content %}
+
+<form action="/agregarTrailerLibro/{{libro.id}}" method="POST" enctype=multipart/form-data>
+    <input type="file" name="file">
+    <input type="hidden" name="id" value="{{libro.id}}">
+    <input type="submit">
+</form>
+
+{% endblock %}

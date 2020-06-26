@@ -1,0 +1,41 @@
+    
+{% extends "admin.html" %}
+  {% block content %}  
+    <section id="signup">
+      <h1 style="text-align: center;">Modifica los datos personales de tu cuenta</h1>
+
+
+      
+        <p id="los_errores"></p>
+      
+        <form name="registro" method="post" action="{{ url_for('modificarDatosPersonales') }}" onsubmit="return validateForm()">
+      
+          <div class="form-group">
+            <label for="mail">Correo Electrónico </label>
+            <input type="email" class="form-control" id="mail" value="{{usuario.correo}}" name="correo">
+          </div>
+
+          <div class="form-group">
+            <label for="contrasenia1">Clave actual</label>
+            <input type="password" class="form-control" id="contrasenia1" name="passwordAct">
+          </div>
+
+          <div class="form-group">
+            <label for="contrasenia1">Nueva clave</label>
+            <input type="password" class="form-control" id="contrasenia1" name="password1">
+          </div>
+          <div class="form-group">
+            <label for="contrasenia2">Repetir clave</label>
+            <input type="password" class="form-control" id="contrasenia2" name="password2">
+          </div>
+      
+          <!-------------------------------->
+      
+          <center><button type="submit" class="btn btn-success btn-lg">Aplicar los Cambios</button></center> <br />
+          <center><a class="btn btn-outline-primary btn-lg" href="{{ url_for('admin') }}" role="button">Volver</a></center>
+          <p id="hay_errores"></p>
+      
+        </form>
+      
+      </section>
+    {% endblock %}

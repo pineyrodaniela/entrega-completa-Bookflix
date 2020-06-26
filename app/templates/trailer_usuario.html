@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_render_elements.html" import render_messages %}
+{% from "_render_elements.html" import render_input %}
+
+
+{% block content %}
+<body>
+
+<section id="pricing"> 
+<div  style="display: flex; margin-left: 15%;">
+<div>    
+{% if lista %}
+    <h1>Libros con trailer</h1>
+	<table class="table col-xs-6" style="display: inline-block;">
+        <tr>
+            <th>Titulo</th>
+            <th>Nombre</th>
+            <th></th>
+        </tr>
+        {% for libro in lista %}
+        <tr>
+            <td><a href="mostrarLibro/{{libro[0].id}}">{{ libro[0].titulo }}</a></td>
+            <td>{{ libro[1].nombre }}</td>
+            <td><form action="/trailersU" method="POST">
+                <input type="hidden" name="nombre" value="{{libro[1].nombre}}">
+                <input type="submit" value="Ver">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+            </table>
+{% endif %}
+</div>
+<div style="margin-left: 20%;">
+{% if listaN %}
+	<h1>Trailers</h1>
+	<table class="table col-xs-6" style="float: left">
+<tr>
+    <th>Titulo</th>
+    <th></th>
+</tr>
+    {% for t in listaN %}
+<tr>
+    <td>{{ t.nombre }}</td>
+    <td><form action="/trailersU" method="POST">
+        <input type="hidden" name="nombre" value="{{t.nombre}}">
+        <input type="submit" value="Ver">
+        </form>
+    </td>
+</tr>
+    {% endfor %}
+    </table>
+{% endif %}
+</div>
+</div>
+  </section>
+</body>
+{% endblock %}
