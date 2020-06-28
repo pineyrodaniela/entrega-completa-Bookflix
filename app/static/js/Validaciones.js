@@ -476,6 +476,28 @@ function validarNuevoPerfil() {
 }
 
 
+function validarModificacionPerfil() {
+  var msg = ''
+  var error = false;
+
+  //Nombre de perfil
+  var x = document.forms["modificando_el_perfil"]["profile_name"].value;
+
+  if ((x == "") || (validarTexto(x) == false)) {
+    msg = msg + "- Campo 'Nombre' vacio o nombre invalido <br />";
+    error = true;
+  }
+
+  if (error == true) {
+    document.getElementById("los_errores").innerHTML = msg;
+    document.getElementById("hay_errores").innerHTML = "Se han encontrado errores en el formulario. Revísalo e intenta de nuevo.";
+    return false;
+  }
+  return true;
+
+}
+
+
 
 function confirmarBorrarPerfil() {
   if (!confirm("¿Estas seguro de que quieres borrar este perfil?")) {
