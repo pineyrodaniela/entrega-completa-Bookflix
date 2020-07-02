@@ -523,7 +523,7 @@ def signup_standard():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if "usermail" in session:
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
         user = Users.query.filter_by(correo=request.form["correo_login"]).first()
@@ -542,16 +542,49 @@ def login():
                 return redirect(url_for("admin"))
             else:
                 flash ("Has iniciado sesión. Bienvenido de nuevo!", "success_login")
-                return redirect(url_for("index"))
+                return redirect(url_for("elige_un_perfil"))
         flash("El correo o la contraseña ingresados son inválidos, revisa e intenta de nuevo.", "error")
 
     return render_template("login.html")
+
+@app.route("/p", methods=["GET", "POST"])
+def elige_un_perfil():
+    if "usermail" in session:
+        elmail = session["usermail"]
+        us = Users.query.filter_by(correo=elmail).first() # Obtiene el usuario a buscar sus perfiles
+        #2) Filtrar elementos que coincidan: el usuario_id de la tabla perfiles con el id del usuario logueado
+        lista = Perfiles.query.filter_by(usuario_id=us.id).all() # se obtienen todos los perfiles del usuario logueado
+        perfiles = []
+        for profileee in lista:
+
+            if (profileee.perfil_borrado == "False"):
+
+                dic = {"profile_img": " ", "nombre_de_perfil": " ", "id_de_perfil": 0}
+
+                dic["nombre_de_perfil"] = profileee.nombre_perfil
+                dic["profile_img"] = profileee.imagen_de_perfil
+                dic["id_de_perfil"] = profileee.id
+
+                perfiles.append(dic)
+        # Se creó la lista de diccionarios con los perfiles del usuario
+
+        if request.method == "POST":
+            session["perfilElegido"] = request.form["id_del_perfil_elegido"]
+            return redirect(url_for("index"))
+
+        return render_template("eligeUnPerfil.html", perfiles=perfiles)
+
+    flash("Debes iniciar sesion primero", "error")
+    return redirect(url_for("login"))
+
 
 @app.route("/logout")
 def logout():
     if "usermail" in session:
         session.pop("usermail", None) # Cierra la sesión
         session.pop("tipoUser", None)
+        if "perfilElegido" in session:
+            session.pop("perfilElegido", None)
         flash ("Ha cerrado la sesión con éxito.", "success_logout")
         return redirect(url_for("index"))
 
@@ -564,8 +597,12 @@ def logout():
 @app.route("/")
 def index():
     if "usermail" in session:
-        libros = Libros.query.filter_by(oculto=0).all()
-        return render_template("vistaUserRegistrado.html", libros=libros)
+        if "perfilElegido" in session:
+            libros = Libros.query.filter_by(oculto=0).all()
+            perfilActual = Perfiles.query.filter_by(id=session["perfilElegido"]).first()
+            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual)
+        else:
+            return redirect(url_for("elige_un_perfil"))
     else:
         libro = Libros.query.order_by(Libros.id).all()
         a = random.sample(libro, 5)
@@ -607,6 +644,8 @@ def borrar_def():
 
         session.pop("usermail", None) # Cierra la sesión
         session.pop("tipoUser", None)
+        if "perfilElegido" in session:
+            session.pop("perfilElegido", None)
 
         flash("Tu cuenta ha sido cerrada satisfactoriamente", "success_deleted_account")
         return redirect(url_for("index"))
