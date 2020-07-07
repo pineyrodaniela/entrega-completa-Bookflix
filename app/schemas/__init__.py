@@ -27,6 +27,12 @@ class Perfiles(db.Model):
     imagen_de_perfil = db.Column(db.String(150), nullable=False)
     perfil_borrado = db.Column(db.String(5), nullable=False)
 
+class Favoritos(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    perfil_id = db.Column(db.Integer, nullable=False)
+    libro_id = db.Column(db.Integer, nullable=False)
+    favorito_borrado = db.Column(db.String(5), nullable=False)
+
 class Libros(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     titulo = db.Column(db.String(50))
@@ -42,7 +48,7 @@ class Libros(db.Model):
     oculto = db.Column(db.Integer, nullable=False, default = 0)
     pathPortada = db.Column(db.String, default = "../static/imgs/Portadas\default\portadaDefault.jpg")
 
-    
+
 class Capitulos(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nomCap = db.Column(db.String(200))

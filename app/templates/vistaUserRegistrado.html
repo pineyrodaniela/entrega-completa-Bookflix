@@ -1,24 +1,62 @@
 {% extends "NavBarUser.html" %}
-  {% block content %}
-    <h4 style="padding:40px 0; font-family: 'Bebas Neue'; color: #E50914; letter-spacing: 2px; font-size:30px;"> <center>Hola, {{perfilActual.nombre_perfil}}</center> </h4>
-  <table class="table table-hover table-dark">
-    <thead>
-      <tr>
-        <th scope="col" style="text-align: center;">Titulo</th>
-        <th scope="col" style="text-align: center;">Cantidad de capitulos</th>
-        <th scope="col" style="text-align: center;">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for l in libros %}
-      <tr style="background-color: #1D1B1C">
-        <td style="text-align: center;">{{l.titulo}}</td>
-        <td style="text-align: center;">{{l.cantCapTotales}}</td>
-        <td style="text-align: center;">
-            <a href="/mostrarLibro/{{l.id}}" class="btn btn-info" role="button" ><i class="fa fa-eye"></i></a>
-        </td>
-      </tr>
+{% block content %}
+<h3 style="padding:40px 0 0 0; font-family: 'Bebas Neue'; color: #E50914; letter-spacing: 2px; font-size:30px;">
+  <center>Hola, {{perfilActual.nombre_perfil}}</center>
+</h3>
+<p style="text-align:center; color: black; padding: 0 0 40px 0">
+  <a href="#cat" style="color:#000050;">Catálogo</a>  &nbsp;&nbsp;&nbsp;&nbsp;  <a href="#faves" style="color:#000050;">Mis Favoritos</a>  &nbsp;&nbsp;&nbsp;&nbsp;   Historial
+</p>
+
+<!-- Mi Lista. Favoritos -->
+<h5 id="faves" style="text-align: center; font-weight:bold;">TUS LIBROS FAVORITOS</h5>
+<table class="table table-hover table-dark">
+  <thead>
+    <tr>
+      <th scope="col" style="text-align: center;">Titulo</th>
+      <th scope="col" style="text-align: center;">Cantidad de capitulos</th>
+      <th scope="col" style="text-align: center;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for libro_fav_dic in l %}
+    <tr style="background-color: #1D1B1C">
+      <td style="text-align: center;">{{ libro_fav_dic['titulo_libro'] }}</td>
+      <td style="text-align: center;">{{ libro_fav_dic['cantidad_de_capitulos'] }}</td>
+      <td style="text-align: center;">
+        <a href="/mostrarLibro/{{ libro_fav_dic['id_libro'] }}" class="btn btn-info" role="button"><i class="fa fa-eye"></i></a>
+        <form action="{{ url_for('quitar_favorito') }}" method="post" onsubmit="return confirmarQuitarFavorito();">
+          <input type="text" name="id_favorito_a_quitar" value="{{ libro_fav_dic['id_fav'] }}" style="display: none;">
+          <button type="submit" name="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+        </form>
+      </td>
+    </tr>
     {% endfor %}
-    </tbody>
-  </table>
-  {% endblock %}
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<!-- Catálogo completo de libros -->
+<h5 id="cat" style="text-align: center; font-weight:bold;">CATÁLOGO</h5>
+<table class="table table-hover table-dark">
+  <thead>
+    <tr>
+      <th scope="col" style="text-align: center;">Titulo</th>
+      <th scope="col" style="text-align: center;">Cantidad de capitulos</th>
+      <th scope="col" style="text-align: center;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in libros %}
+    <tr style="background-color: #1D1B1C">
+      <td style="text-align: center;">{{l.titulo}}</td>
+      <td style="text-align: center;">{{l.cantCapTotales}}</td>
+      <td style="text-align: center;">
+        <a href="/mostrarLibro/{{l.id}}" class="btn btn-info" role="button"><i class="fa fa-eye"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

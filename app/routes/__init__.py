@@ -48,11 +48,21 @@ def mostrarLibro(n):
     edit = Editoriales.query.filter_by(id = libro.editorial_id).first()
     gen = Generos.query.filter_by(id = libro.genero_id).first()
     datetime_act = datetime.now()
+
+    yaEnFavoritos = False
+    if "perfilElegido" in session:
+        favoritos_delPerfil = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for libro_fav in favoritos_delPerfil:
+            if libro_fav.favorito_borrado == "False":
+                libroAct = Libros.query.filter_by(id=libro_fav.libro_id).first()
+                if libroAct.titulo == libro.titulo:
+                    yaEnFavoritos = True
+
     if libro.tiene_trailer:
         trailerL = trailers.query.filter_by(libro_id=libro.id).first()
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act)
+        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
     else:
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, datetime_act = datetime_act)
+        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
 
 @app.route("/borrarLibro/<int:n>", methods= ["GET", "POST"])
 def borrarLibro(n):
@@ -550,29 +560,32 @@ def login():
 @app.route("/p", methods=["GET", "POST"])
 def elige_un_perfil():
     if "usermail" in session:
-        elmail = session["usermail"]
-        us = Users.query.filter_by(correo=elmail).first() # Obtiene el usuario a buscar sus perfiles
-        #2) Filtrar elementos que coincidan: el usuario_id de la tabla perfiles con el id del usuario logueado
-        lista = Perfiles.query.filter_by(usuario_id=us.id).all() # se obtienen todos los perfiles del usuario logueado
-        perfiles = []
-        for profileee in lista:
+        if not ("perfilElegido" in session):
+            elmail = session["usermail"]
+            us = Users.query.filter_by(correo=elmail).first() # Obtiene el usuario a buscar sus perfiles
+            #2) Filtrar elementos que coincidan: el usuario_id de la tabla perfiles con el id del usuario logueado
+            lista = Perfiles.query.filter_by(usuario_id=us.id).all() # se obtienen todos los perfiles del usuario logueado
+            perfiles = []
+            for profileee in lista:
 
-            if (profileee.perfil_borrado == "False"):
+                if (profileee.perfil_borrado == "False"):
 
-                dic = {"profile_img": " ", "nombre_de_perfil": " ", "id_de_perfil": 0}
+                    dic = {"profile_img": " ", "nombre_de_perfil": " ", "id_de_perfil": 0}
 
-                dic["nombre_de_perfil"] = profileee.nombre_perfil
-                dic["profile_img"] = profileee.imagen_de_perfil
-                dic["id_de_perfil"] = profileee.id
+                    dic["nombre_de_perfil"] = profileee.nombre_perfil
+                    dic["profile_img"] = profileee.imagen_de_perfil
+                    dic["id_de_perfil"] = profileee.id
 
-                perfiles.append(dic)
-        # Se creó la lista de diccionarios con los perfiles del usuario
+                    perfiles.append(dic)
+            # Se creó la lista de diccionarios con los perfiles del usuario
 
-        if request.method == "POST":
-            session["perfilElegido"] = request.form["id_del_perfil_elegido"]
+            if request.method == "POST":
+                session["perfilElegido"] = request.form["id_del_perfil_elegido"]
+                return redirect(url_for("index"))
+
+            return render_template("eligeUnPerfil.html", perfiles=perfiles)
+        else:
             return redirect(url_for("index"))
-
-        return render_template("eligeUnPerfil.html", perfiles=perfiles)
 
     flash("Debes iniciar sesion primero", "error")
     return redirect(url_for("login"))
@@ -600,7 +613,22 @@ def index():
         if "perfilElegido" in session:
             libros = Libros.query.filter_by(oculto=0).all()
             perfilActual = Perfiles.query.filter_by(id=session["perfilElegido"]).first()
-            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual)
+            favoritos_perfilActual = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
+            l = []
+            for libro_favorito in favoritos_perfilActual:
+                if libro_favorito.favorito_borrado == "False":
+                    libro = Libros.query.filter_by(id=libro_favorito.libro_id).first()
+                    dic = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_fav": 0}
+
+                    dic["id_fav"] = libro_favorito.id
+
+                    dic["titulo_libro"] = libro.titulo
+                    dic["cantidad_de_capitulos"] = libro.cantCapTotales
+                    dic["id_libro"] = libro.id
+
+                    l.append(dic)
+
+            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l)
         else:
             return redirect(url_for("elige_un_perfil"))
     else:
@@ -890,6 +918,48 @@ def modificando_perfil():
 
         flash("Acceso denegado", "error")
         return redirect(url_for("modificar_perfil"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/agregandoFavorito", methods=['POST', 'GET'])
+def agregar_a_favoritos():
+    if "usermail" in session:
+        if request.method == 'POST':
+            if "perfilElegido" in session:
+                nuevo_favorito = Favoritos(perfil_id = session["perfilElegido"],
+                                           libro_id = request.form["id_del_libro_elegido_para_favoritos"],
+                                           favorito_borrado = "False")
+
+                db.session.add(nuevo_favorito)
+                db.session.commit()
+
+                flash("Libro agregado a favoritos con éxito", "success")
+                return redirect(url_for("index"))
+            else:
+                return redirect(url_for("elige_un_perfil"))
+
+        else:
+            return redirect(url_for("index"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/quitandoFavorito", methods=['POST', 'GET'])
+def quitar_favorito():
+    if "usermail" in session:
+        if request.method == 'POST':
+            favorito_a_quitar = Favoritos.query.filter_by(id=request.form['id_favorito_a_quitar']).first()
+            favorito_a_quitar.favorito_borrado = "True"
+
+            db.session.commit()
+
+            flash("Libro quitado de favoritos con éxito", "success")
+            return redirect(url_for("index"))
+        else:
+            return redirect(url_for("index"))
 
     flash("Debes loguearte primero para acceder a esta sección", "error")
     return redirect(url_for("login"))

@@ -30,6 +30,14 @@
   <!--JS Scripts-->
   <script src="{{ url_for('static', filename='js/Validaciones.js') }}"></script>
 
+  <script type="text/javascript">
+    function confirmarQuitarFavorito() {
+      if (!confirm("¿Estas seguro de que quieres quitar este favorito?")) {
+        event.preventDefault();
+      }
+    }
+  </script>
+
 </head>
 
 <body>
