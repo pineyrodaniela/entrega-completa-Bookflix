@@ -8,7 +8,7 @@ from os import path
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import shutil, sys                                                                                                                                                    
-
+import easygui as eg
 
 @app.route("/listarCapitulosUser/<int:LibroId>")
 def listarCapUser(LibroId):
@@ -994,13 +994,61 @@ def search():
         tag = request.form["book"]
         search = "%{}%".format(tag)
         libro = Libros.query.filter(Libros.titulo.ilike(search)).all()
-        autor = Autores.query.filter(Autores.nomAutor.ilike(search)).first()
+        autor = Autores.query.filter(Autores.nomAutor.ilike(search)).all()
         genero = Generos.query.filter(Generos.nomGenero.ilike(search)).first()
         if (autor != None):
-            librosAut = Libros.query.filter_by(autor_id=autor.id).all()
+            librosAut = []
+            for i in autor:
+                lib = (Libros.query.filter_by(autor_id=i.id).all())
+                librosAut.append([lib, i])  
             return render_template("busqueda.html", autor=autor, librosAut=librosAut, genero=genero, libro= libro)
-        elif genero != None:
+        elif (genero != None):
             librosGen = Libros.query.filter_by(genero_id=genero.id).all()
             return render_template("busqueda.html", genero=genero, librosGen=librosGen, autor=autor, libro=libro )    
         else:   
             return render_template("busqueda.html", libro=libro, genero=genero, autor=autor)
+
+@app.route("/searchA/<string:s>")
+def searchA(s):
+    search = "%{}%".format(s)
+    autor = Autores.query.filter(Autores.nomAutor.ilike(search)).all()
+    librosAut = []
+    for i in autor:
+        lib = (Libros.query.filter_by(autor_id=i.id).all())
+        librosAut.append([lib, i])  
+    return render_template("busqueda.html", autor=autor, librosAut=librosAut, genero=genero, libro= libro)
+
+@app.route("/verComentariosAdm")
+def verComentariosAdm():
+    comentarios = Valoracion.query.order_by(Valoracion.fecha_valoracion.desc()).all()
+    lista = []
+    for i in comentarios:
+        lib = (Libros.query.filter_by(id=i.lib_id).first())
+        lista.append([lib, i])
+    return render_template("verComentariosAdm.html", lista=lista)
+
+@app.route("/borrarComentario/<int:id>")
+def borrarComentario(id):
+    comentario_a_borrar = Valoracion.query.get_or_404(id)
+    comentario_a_borrar.comentario = ""
+    comentario_a_borrar.c_borrado = 1
+    db.session.commit()
+    flash ("comentario borrado con exito", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/marcarSpoiler/<int:id>")    
+def marcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 1
+    db.session.commit()
+    flash ("Comentario marcado como spoiler", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/desmarcarSpoiler/<int:id>")    
+def desmarcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 0
+    db.session.commit()
+    flash ("Comentario desmarcado", "success")
+    return redirect('/verComentariosAdm')    
+                    
