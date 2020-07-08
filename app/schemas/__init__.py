@@ -81,3 +81,21 @@ class trailers(db.Model):
     nombre = db.Column(db.String, nullable=False)
     libro_id = db.Column(db.Integer, nullable=True)
     file = db.Column(db.String)
+
+class Historial(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    lib_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    perfil_id = db.Column(db.Integer)
+    fecha_lectura = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Valoracion(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    lib_id = db.Column(db.Integer, nullable= False)
+    user_id = db.Column(db.Integer, nullable= False)
+    perfil_id = db.Column(db.Integer, nullable= False)
+    puntuacion = db.Column(db.Integer)
+    comentario = db.Column(db.String(500))
+    fecha_valoracion = db.Column(db.DateTime, default= datetime.utcnow)
+    es_spoiler = db.Column(db.Integer, nullable=False, default = 0)
+    c_borrado = db.Column(db.Integer, nullable=False, default = 0)      
