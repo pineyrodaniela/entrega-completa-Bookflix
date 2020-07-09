@@ -8,7 +8,7 @@ from os import path
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import shutil, sys                                                                                                                                                    
-
+import easygui as eg
 
 @app.route("/listarCapitulosUser/<int:LibroId>")
 def listarCapUser(LibroId):
@@ -48,11 +48,21 @@ def mostrarLibro(n):
     edit = Editoriales.query.filter_by(id = libro.editorial_id).first()
     gen = Generos.query.filter_by(id = libro.genero_id).first()
     datetime_act = datetime.now()
+
+    yaEnFavoritos = False
+    if "perfilElegido" in session:
+        favoritos_delPerfil = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for libro_fav in favoritos_delPerfil:
+            if libro_fav.favorito_borrado == "False":
+                libroAct = Libros.query.filter_by(id=libro_fav.libro_id).first()
+                if libroAct.titulo == libro.titulo:
+                    yaEnFavoritos = True
+
     if libro.tiene_trailer:
         trailerL = trailers.query.filter_by(libro_id=libro.id).first()
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act)
+        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
     else:
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, datetime_act = datetime_act)
+        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
 
 @app.route("/borrarLibro/<int:n>", methods= ["GET", "POST"])
 def borrarLibro(n):
@@ -133,7 +143,7 @@ def modificarCapitulo(lib,cap):
 UPLOAD_PDFs = os.path.abspath("./app/static/archivos/PDFs")
 UPLOAD_PORTADAS = os.path.abspath("./imgs/Portadas/")
 UPLOAD_FOLDER = os.path.abspath("./archivos/trailers")
- 
+
 
 app.config['UPLOAD_PDFs'] = UPLOAD_PDFs
 app.config['UPLOAD_PORTADAS'] = UPLOAD_PORTADAS
@@ -171,7 +181,7 @@ def subirCapitulo(n):
             if f and allowed_file_lib(f.filename):
                 num = libro.capSubidosAct+1
                 direc = UPLOAD_PDFs + "\\" + str(libro.id) + "\\" + str(num)
-                
+
                 pathFile = "\static\\archivos\PDFs" + "\\" + str(libro.id) + "\\" + str(num)
 
                 if path.exists(direc):
@@ -180,11 +190,11 @@ def subirCapitulo(n):
                     os.makedirs(direc)
                 filename = secure_filename(f.filename)
                 fecha = datetime.strptime(request.form["fec_ven"], '%d-%m-%Y' )
-                nue_cap = Capitulos(nomCap= filename, lib_id= n, numCap= libro.capSubidosAct+1, fecha_vencimiento= fecha, 
+                nue_cap = Capitulos(nomCap= filename, lib_id= n, numCap= libro.capSubidosAct+1, fecha_vencimiento= fecha,
                                     cantidad_de_paginas= request.form["cantPags"], path= os.path.join(pathFile))
 
                 libro.capSubidosAct = libro.capSubidosAct +1
-                
+
                 db.session.add(nue_cap)
                 db.session.commit()
                 filename = secure_filename(f.filename)
@@ -218,13 +228,13 @@ def subirLibroCompleto(n):
             if path.exists(direc):
                 messages = "Ya existe esa carpeta"
                 return render_template("admin.html", messages = messages)
-                
+
             else:
                 os.makedirs(direc)
 
             filename = secure_filename(f.filename)
             fecha = datetime.strptime(request.form["fec_ven"], '%d-%m-%Y' )
-            nue_cap = Capitulos(nomCap= filename, lib_id= n, numCap= 1, fecha_vencimiento= fecha, 
+            nue_cap = Capitulos(nomCap= filename, lib_id= n, numCap= 1, fecha_vencimiento= fecha,
                                 cantidad_de_paginas= request.form["cantPags"], path= os.path.join(pathFile))
 
             libro.capSubidosAct = libro.capSubidosAct +1
@@ -245,14 +255,14 @@ def darDeAlta():
         if session["tipoUser"] != 3:
             return render_template("index.html")
         else:
-            
+
             if request.method == "POST":
 
                 if "editorial" in request.form:
                     editRepe = Editoriales.query.filter_by(nomEditorial=request.form["editorial"]).first()
                     if editRepe:
                         flash("Ya existe esa editorial en la base de datos.", "error")
-                    
+
                     else:
 
                         nue_editorial = Editoriales(nomEditorial= request.form["editorial"])
@@ -266,7 +276,7 @@ def darDeAlta():
 
                     if genRepe:
                         flash("Ya existe ese genero en la base de datos.", "error")
-                    
+
                     else:
                         nue_genero = Generos(nomGenero= request.form["genero"])
                         db.session.add(nue_genero)
@@ -306,7 +316,7 @@ def cargarLibro ():
                 if libroRepe is not None:
                     flash("El ISBN ingresado ya se encuentra en la base de datos", "error")
                     return render_template("agregarlibro.html", allEditoriales = allEditoriales, allGeneros = allGeneros, allAutores= allAutores)
-                
+
                 nue_libro = Libros(titulo= request.form["titulo"], descripcion = request.form["descripcion"],
                 ISBN = request.form["ISBN"] , editorial_id= request.form["editorial"],
                 autor_id = request.form["autor"], genero_id= request.form["genero"],
@@ -321,14 +331,14 @@ def cargarLibro ():
 
 @app.route('/modificarLibro/<int:n>', methods= ["GET", "POST"])
 def modificarLibro (n):
-    if session["tipoUser"] != 3 or session["tipoUser"] == None:  
+    if session["tipoUser"] != 3 or session["tipoUser"] == None:
         return render_template("index.html")
     else:
         libroMod = Libros.query.get_or_404(n) #traigo el libro de la DB con id n
         if request.method == "POST":
             libroRepe = Libros.query.filter_by(ISBN=request.form["ISBN"]).first()
-                
-        
+
+
             if ((libroRepe is not(None)) and (libroRepe.id == libroMod.id)):
                 msj = ""
                 des = request.form["descripcion"]
@@ -336,10 +346,10 @@ def modificarLibro (n):
                 fecEd= request.form["edicion"]
                 if ((des == "") or (not des)):
                     msj = msj + "- Descripcion vacía \n"
-                
+
                 if (fecEd == ""):
                     msj = msj + "- campo fecha vacío \n"
-                
+
                 if msj != "":
                     flash("Error al modificar libro:" + "\n" + msj, "error")
                     return render_template("admin.html")
@@ -360,7 +370,7 @@ def modificarLibro (n):
                     flash("El ISBN ingresado es nulo o menor a 1", "error")
                 else:
                     flash("El ISBN ingresado ya existe en la base de datos", "error")
-            
+
             return render_template('admin.html')
 
         else:
@@ -523,7 +533,7 @@ def signup_standard():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if "usermail" in session:
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
         user = Users.query.filter_by(correo=request.form["correo_login"]).first()
@@ -542,16 +552,52 @@ def login():
                 return redirect(url_for("admin"))
             else:
                 flash ("Has iniciado sesión. Bienvenido de nuevo!", "success_login")
-                return redirect(url_for("index"))
+                return redirect(url_for("elige_un_perfil"))
         flash("El correo o la contraseña ingresados son inválidos, revisa e intenta de nuevo.", "error")
 
     return render_template("login.html")
+
+@app.route("/p", methods=["GET", "POST"])
+def elige_un_perfil():
+    if "usermail" in session:
+        if not ("perfilElegido" in session):
+            elmail = session["usermail"]
+            us = Users.query.filter_by(correo=elmail).first() # Obtiene el usuario a buscar sus perfiles
+            #2) Filtrar elementos que coincidan: el usuario_id de la tabla perfiles con el id del usuario logueado
+            lista = Perfiles.query.filter_by(usuario_id=us.id).all() # se obtienen todos los perfiles del usuario logueado
+            perfiles = []
+            for profileee in lista:
+
+                if (profileee.perfil_borrado == "False"):
+
+                    dic = {"profile_img": " ", "nombre_de_perfil": " ", "id_de_perfil": 0}
+
+                    dic["nombre_de_perfil"] = profileee.nombre_perfil
+                    dic["profile_img"] = profileee.imagen_de_perfil
+                    dic["id_de_perfil"] = profileee.id
+
+                    perfiles.append(dic)
+            # Se creó la lista de diccionarios con los perfiles del usuario
+
+            if request.method == "POST":
+                session["perfilElegido"] = request.form["id_del_perfil_elegido"]
+                return redirect(url_for("index"))
+
+            return render_template("eligeUnPerfil.html", perfiles=perfiles)
+        else:
+            return redirect(url_for("index"))
+
+    flash("Debes iniciar sesion primero", "error")
+    return redirect(url_for("login"))
+
 
 @app.route("/logout")
 def logout():
     if "usermail" in session:
         session.pop("usermail", None) # Cierra la sesión
         session.pop("tipoUser", None)
+        if "perfilElegido" in session:
+            session.pop("perfilElegido", None)
         flash ("Ha cerrado la sesión con éxito.", "success_logout")
         return redirect(url_for("index"))
 
@@ -564,8 +610,27 @@ def logout():
 @app.route("/")
 def index():
     if "usermail" in session:
-        libros = Libros.query.filter_by(oculto=0).all()
-        return render_template("vistaUserRegistrado.html", libros=libros)
+        if "perfilElegido" in session:
+            libros = Libros.query.filter_by(oculto=0).all()
+            perfilActual = Perfiles.query.filter_by(id=session["perfilElegido"]).first()
+            favoritos_perfilActual = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
+            l = []
+            for libro_favorito in favoritos_perfilActual:
+                if libro_favorito.favorito_borrado == "False":
+                    libro = Libros.query.filter_by(id=libro_favorito.libro_id).first()
+                    dic = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_fav": 0}
+
+                    dic["id_fav"] = libro_favorito.id
+
+                    dic["titulo_libro"] = libro.titulo
+                    dic["cantidad_de_capitulos"] = libro.cantCapTotales
+                    dic["id_libro"] = libro.id
+
+                    l.append(dic)
+
+            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l)
+        else:
+            return redirect(url_for("elige_un_perfil"))
     else:
         libro = Libros.query.order_by(Libros.id).all()
         a = random.sample(libro, 5)
@@ -607,6 +672,8 @@ def borrar_def():
 
         session.pop("usermail", None) # Cierra la sesión
         session.pop("tipoUser", None)
+        if "perfilElegido" in session:
+            session.pop("perfilElegido", None)
 
         flash("Tu cuenta ha sido cerrada satisfactoriamente", "success_deleted_account")
         return redirect(url_for("index"))
@@ -794,6 +861,110 @@ def borrar_perfil():
     return redirect(url_for("login"))
 
 
+
+# Variable global
+id_del_perfil_a_modificar = 0
+
+@app.route("/perfiles/modificar", methods=['GET', 'POST'])
+def modificar_perfil():
+    if "usermail" in session:
+
+        elmail = session["usermail"]
+        us = Users.query.filter_by(correo=elmail).first()
+
+        lista = Perfiles.query.filter_by(usuario_id=us.id).all()
+
+        perfiles = []
+
+        for perfilll in lista:
+            if (perfilll.perfil_borrado == "False"):
+
+                dic = {"nombre_perfil_id_perfil": []}
+
+                dic["nombre_perfil_id_perfil"].append(perfilll.nombre_perfil)
+                dic["nombre_perfil_id_perfil"].append(perfilll.id)
+
+                perfiles.append(dic)
+
+        if request.method == "POST": #Hizo click en 'Aceptar' y procede a la pagina de modificacion del perfil seleccionado
+
+            global id_del_perfil_a_modificar
+            id_del_perfil_a_modificar = request.form["perfil_seleccionado"]
+            elPerfil = Perfiles.query.filter_by(id=id_del_perfil_a_modificar).first()
+
+            return render_template("modificando-perfil.html", perfil=elPerfil)
+
+        return render_template("modificar-perfil.html", perfiles=perfiles)
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/perfiles/modificando", methods=['GET', 'POST'])
+def modificando_perfil():
+    if "usermail" in session:
+
+        if request.method == "POST": # Hizo click en Modificar y pasó las validaciones para la modificacion del perfil
+
+            elPerfil = Perfiles.query.filter_by(id=id_del_perfil_a_modificar).first()
+
+            elPerfil.nombre_perfil = request.form["profile_name"]
+            elPerfil.imagen_de_perfil = request.form["profile_avatar"]
+
+            db.session.commit()
+
+            flash("Se ha modificado el perfil con éxito", "success")
+            return redirect(url_for("perfiles"))
+
+        flash("Acceso denegado", "error")
+        return redirect(url_for("modificar_perfil"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/agregandoFavorito", methods=['POST', 'GET'])
+def agregar_a_favoritos():
+    if "usermail" in session:
+        if request.method == 'POST':
+            if "perfilElegido" in session:
+                nuevo_favorito = Favoritos(perfil_id = session["perfilElegido"],
+                                           libro_id = request.form["id_del_libro_elegido_para_favoritos"],
+                                           favorito_borrado = "False")
+
+                db.session.add(nuevo_favorito)
+                db.session.commit()
+
+                flash("Libro agregado a favoritos con éxito", "success")
+                return redirect(url_for("index"))
+            else:
+                return redirect(url_for("elige_un_perfil"))
+
+        else:
+            return redirect(url_for("index"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/quitandoFavorito", methods=['POST', 'GET'])
+def quitar_favorito():
+    if "usermail" in session:
+        if request.method == 'POST':
+            favorito_a_quitar = Favoritos.query.filter_by(id=request.form['id_favorito_a_quitar']).first()
+            favorito_a_quitar.favorito_borrado = "True"
+
+            db.session.commit()
+
+            flash("Libro quitado de favoritos con éxito", "success")
+            return redirect(url_for("index"))
+        else:
+            return redirect(url_for("index"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
 @app.route("/modificarSuscripcion", methods=['POST', 'GET'])
 def modificar_suscripcion():
     if "usermail" in session:
@@ -843,10 +1014,10 @@ def novedades():
             db.session.commit()
             return redirect('/novedadesAdm')
         except:
-            return 'Hubo un problema agregando la novedad'    
+            return 'Hubo un problema agregando la novedad'
 
     else:
-        novedades = novedad.query.order_by(novedad.date_created).all()   
+        novedades = novedad.query.order_by(novedad.date_created).all()
         return render_template("novedadesAdm.html", novedades=novedades)
 
 @app.route('/borrar/<int:id>')
@@ -858,12 +1029,12 @@ def borrar(id):
             db.session.commit()
             return redirect('/novedadesAdm')
         except:
-            return 'Hubo un problema borrando la novedad' 
+            return 'Hubo un problema borrando la novedad'
 
 @app.route('/actualizarNoticia/<int:id>', methods=['GET', 'POST'])
 def actualizar(id):
     novedad_a_actualizar = novedad.query.get_or_404(id)
-      
+
     if request.method == 'POST':
         novedad_a_actualizar.title = request.form['title']
         novedad_a_actualizar.content = request.form['content']
@@ -872,18 +1043,18 @@ def actualizar(id):
             db.session.commit()
             return redirect('/novedadesAdm')
         except:
-            return 'Hubo un problema actualizando la novedad'    
+            return 'Hubo un problema actualizando la novedad'
     else:
-        return render_template('actualizarNoticia.html', novedad_a_actualizar=novedad_a_actualizar)    
+        return render_template('actualizarNoticia.html', novedad_a_actualizar=novedad_a_actualizar)
 
 @app.route("/novedadesU")
 def novedadesU():
-    nove = novedad.query.order_by(novedad.date_created).all() 
+    nove = novedad.query.order_by(novedad.date_created).all()
     return render_template("novedadesU.html", nove=nove)
 
 @app.route('/noticia/<int:id>', methods=['GET', 'POST'])
 def noticia(id):
-        noticia = novedad.query.get_or_404(id)    
+        noticia = novedad.query.get_or_404(id)
         return render_template("noticia.html", noticia=noticia)
 
 @app.route("/agregarTrailer")
@@ -900,31 +1071,31 @@ def uploader():
         if f.filename == "":
             flash ("No hay archivo seleccionado")
             return redirect ("/agregarTrailer")
-        trailerR = trailers.query.filter_by(nombre=f.filename).first()    
+        trailerR = trailers.query.filter_by(nombre=f.filename).first()
         if trailerR:
             flash ("El archivo ya existe")
-            return redirect("/agregarTrailer")    
+            return redirect("/agregarTrailer")
         elif f and allowed_file(f.filename):
             nueT= trailers(nombre= f.filename, file= os.path.join(app.config['UPLOAD_FOLDER']))
             db.session.add(nueT)
-            db.session.commit()    
+            db.session.commit()
             filename = secure_filename(f.filename)
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             flash ("Archivo subido con exito")
             return redirect(url_for("agregarTrailer"))
-        flash ("Archivo no soportado.")                            
+        flash ("Archivo no soportado.")
         return redirect (url_for("agregarTrailer"))
 
 @app.route('/uploads/<filename>', methods=['GET', 'POST'])
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
-                               
-@app.route('/trailersU', methods=['GET', 'POST']) 
+
+@app.route('/trailersU', methods=['GET', 'POST'])
 def trailersU():
     trai = trailers.query.order_by(trailers.id).all()
     lista = []
-    listaN = [] 
+    listaN = []
     for i in trai:
         if i.libro_id:
             lib = (Libros.query.filter_by(id=i.libro_id).first())
@@ -933,16 +1104,16 @@ def trailersU():
             listaN.append(i)
     if request.method == "POST":
         filename = request.form['nombre']
-        return redirect(url_for('uploaded_file', filename=filename))   
+        return redirect(url_for('uploaded_file', filename=filename))
     return render_template("trailer_usuario.html", listaN=listaN, lista=lista)
-    
+
 @app.route("/agregarTrailerLibro/<int:id>", methods=["GET", "POST"])
 def agregarTrailerLibro(id):
     libro = Libros.query.get_or_404(id)
     if libro.tiene_trailer:
         flash("El libro ya tiene un trailer asignado")
         return redirect ("/traerLibros")
-    else:    
+    else:
         if request.method == "POST":
             if "file" not in request.files:
                 return "The form has no file part."
@@ -950,28 +1121,28 @@ def agregarTrailerLibro(id):
             if f.filename == "":
                 flash ("No hay archivo seleccionado")
                 return redirect ("/traerLibros")
-            trailerR = trailers.query.filter_by(nombre=f.filename).first()    
+            trailerR = trailers.query.filter_by(nombre=f.filename).first()
             if trailerR:
                 flash ("El archivo ya existe")
-                return redirect("/traerLibros")    
-            elif f and allowed_file(f.filename):  
+                return redirect("/traerLibros")
+            elif f and allowed_file(f.filename):
                 filename = secure_filename(f.filename)
                 f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 nueT= trailers(nombre= f.filename, libro_id = libro.id, file= os.path.join(app.config['UPLOAD_FOLDER']))
                 db.session.add(nueT)
                 libro.archivo = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 libro.tiene_trailer = 1
-                db.session.commit()  
+                db.session.commit()
                 flash ("Archivo subido con exito")
                 return redirect(url_for("traerLibros"))
-            flash ("Archivo no soportado.")                            
+            flash ("Archivo no soportado.")
             return redirect (url_for("traerLibros"))
-    return render_template ("agregarTrailerLibro.html", libro=libro)        
+    return render_template ("agregarTrailerLibro.html", libro=libro)
 
 @app.route('/BorrarTrailersAdm')
 def trailersAdm():
     trai = trailers.query.order_by(trailers.id).all()
-    return render_template('BorrarTrailersAdm.html', trai=trai)    
+    return render_template('BorrarTrailersAdm.html', trai=trai)
 
 @app.route('/borrarT/<int:id>')
 def borrarT(id):
@@ -979,28 +1150,76 @@ def borrarT(id):
 
         if trailer_a_borrar.libro_id:
             libro = Libros.query.filter_by(id=trailer_a_borrar.libro_id).first()
-            if libro.tiene_trailer:    
+            if libro.tiene_trailer:
                 libro.archivo = ""
-                libro.tiene_trailer = 0 
+                libro.tiene_trailer = 0
         db.session.delete(trailer_a_borrar)
         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], trailer_a_borrar.nombre))
         db.session.commit()
         flash("Trailer borrado", "success")
         return redirect('/BorrarTrailersAdm')
 
+
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         tag = request.form["book"]
-        search = "%{}%".format(tag)
-        libro = Libros.query.filter(Libros.titulo.ilike(search)).all()
-        autor = Autores.query.filter(Autores.nomAutor.ilike(search)).first()
-        genero = Generos.query.filter(Generos.nomGenero.ilike(search)).first()
-        if (autor != None):
-            librosAut = Libros.query.filter_by(autor_id=autor.id).all()
-            return render_template("busqueda.html", autor=autor, librosAut=librosAut, genero=genero, libro= libro)
-        elif genero != None:
-            librosGen = Libros.query.filter_by(genero_id=genero.id).all()
-            return render_template("busqueda.html", genero=genero, librosGen=librosGen, autor=autor, libro=libro )    
-        else:   
-            return render_template("busqueda.html", libro=libro, genero=genero, autor=autor)
+        if tag == "":
+            flash ("La busqueda no arrojo ningun resultado", "error")
+            return redirect("/")
+        else:    
+            search = "%{}%".format(tag)
+            tipo = request.form["tipo_b"]
+            if tipo == "libro":
+                libro = Libros.query.filter(Libros.titulo.ilike(search)).all()
+                libros = []
+                for i in libro:
+                    aut = (Autores.query.filter_by(id=i.autor_id).first())
+                    libros.append([aut, i])  
+                return render_template("busquedaL.html", libros=libros)
+            elif tipo == "aut": 
+                autor = Autores.query.filter(Autores.nomAutor.ilike(search)).all()
+                librosAut = []
+                for i in autor:
+                    libA = (Libros.query.filter_by(autor_id=i.id).all())
+                    librosAut.append([libA, i])     
+                return render_template("busquedaA.html", librosAut=librosAut)
+            elif tipo == "gen":    
+                genero = Generos.query.filter(Generos.nomGenero.ilike(search)).first() 
+                librosGen = (Libros.query.filter_by(genero_id=genero.id).all())             
+                return render_template("busquedaG.html", librosGen=librosGen, genero=genero)        
+   
+@app.route("/verComentariosAdm")
+def verComentariosAdm():
+    comentarios = Valoracion.query.order_by(Valoracion.fecha_valoracion.desc()).all()
+    lista = []
+    for i in comentarios:
+        lib = (Libros.query.filter_by(id=i.lib_id).first())
+        lista.append([lib, i])
+    return render_template("verComentariosAdm.html", lista=lista)
+
+@app.route("/borrarComentario/<int:id>")
+def borrarComentario(id):
+    comentario_a_borrar = Valoracion.query.get_or_404(id)
+    comentario_a_borrar.comentario = ""
+    comentario_a_borrar.c_borrado = 1
+    db.session.commit()
+    flash ("comentario borrado con exito", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/marcarSpoiler/<int:id>")    
+def marcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 1
+    db.session.commit()
+    flash ("Comentario marcado como spoiler", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/desmarcarSpoiler/<int:id>")    
+def desmarcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 0
+    db.session.commit()
+    flash ("Comentario desmarcado", "success")
+    return redirect('/verComentariosAdm')    
+                    
