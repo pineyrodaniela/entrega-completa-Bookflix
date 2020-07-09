@@ -1,0 +1,36 @@
+{% extends "admin.html" %}
+
+
+
+{% block content %}
+<body>
+
+<section id="pricing"> 
+<div class="content">
+	<h1 style="text-align: left;">Comentarios</h1>
+	<table class="table table-hover table-dark">
+       
+<tr>
+    <th scope="col" style="text-align: center;">Comentario</th>
+    <th scope="col" style="text-align: center;">Libro</th>
+    <th scope="col" style="text-align: center;">Acciones</th>
+</tr>
+{% for c in lista %}
+{% if c[1].c_borrado == 0: %} 
+<tr>
+    <td style="text-align: center;">{{ c[1].comentario }}</td>
+    <td style="text-align: center;">{{ c[0].titulo }}</td>
+    <td style="text-align: center;">
+        <a href="borrarComentario/{{c[1].id}}" class="btn btn-danger xd" role="button" ><i class="far fa-trash-alt"></i></a>
+        <a href="marcarSpoiler/{{c[1].id}}"><button type="button" class="btn btn-success"><i class="fa fa-eye-slash"></i></button></a>
+        <a href="desmarcarSpoiler/{{c[1].id}}"><button type="button" class="btn btn-primary"><i class="fa fa-eye"></i></button></a>  
+    </td>
+</tr>
+{% endif %}
+{% endfor %}
+    </table>   
+</div>
+    </div>
+  </section>
+</body>
+{% endblock %}

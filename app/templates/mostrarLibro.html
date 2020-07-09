@@ -30,13 +30,30 @@
     {% elif l.capSubidosAct > 1 %}
     <a href="/listarCapitulosUser/{{l.id}}" type="button" class="btn btn-primary btn-lg">Elegir capitulo</a></br>
     {% endif %}
+
+    <br />
+    <br />
+    {% if l.capSubidosAct != 0 %}
+      {% if datetime_act < c.fecha_vencimiento %}
+        {% if not yaEnFavoritos %}
+          <form name="agregar_libro_a_favoritos" action="{{ url_for('agregar_a_favoritos') }}" method="post">
+            <input type="text" name="id_del_libro_elegido_para_favoritos" value="{{l.id}}" style="display: none;">
+            <button type="submit" name="button" class="btn btn-warning btn-lg"><i class="fas fa-star"></i> Agregar a Favoritos</button>
+          </form>
+        {% endif %}
+        {% if yaEnFavoritos %}
+          <p><mark><i class="fas fa-star"></i>Este libro está guardado en tus favoritos</mark></p>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
     {% if trailerL %}
     <form action="/trailersU" method="POST">
         <input  type="hidden" name="nombre" value="{{trailerL.nombre}}">
         <input type="submit" class="btn btn-secondary btn-lg" value="Ver trailer">
         </form>
     {% endif %}
-    </div><br> 
+    </div><br>
     </div>
 </section>
 {% endblock %}
