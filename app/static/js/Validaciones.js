@@ -253,7 +253,7 @@ function validarGenero() {
   if (error == true) {
     document.getElementById("los_errores").innerHTML = msg;
     return false;
-  } 
+  }
   return true;
 }
 
@@ -329,7 +329,7 @@ function validarModCapitulo(){
   if (fecVen == ""){
     msg = msg + "- Fecha inválida"
     error = true
-  } 
+  }
   if (error == true){
     document.getElementById("los_errores").innerHTML = msg;
     return false;
@@ -338,12 +338,12 @@ function validarModCapitulo(){
 }
 
 function validarModificacion() {
-  
+
   var msg = ''
   var error = false;
 
   //Nombre
-  var x = document.forms["registro"]["nombre"].value;
+  var x = document.forms["modificar_datos_personales"]["nombre"].value;
 
   if ((x == "") || (validarTexto(x) == false)) {
     msg = msg + "- Campo 'Nombre' vacio o nombre invalido <br />";
@@ -351,24 +351,16 @@ function validarModificacion() {
   }
 
   //Apellido
-  var apellido = document.forms["registro"]["apellido"].value;
+  var apellido = document.forms["modificar_datos_personales"]["apellido"].value;
 
   if ((apellido == "") || (validarTexto(apellido) == false)) {
     msg = msg + "- Campo 'Apellido' vacio o apellido invalido <br />";
     error = true;
   }
 
-  //Correo Electronico
-  var email = document.forms["registro"]["correo"].value;
-
-  if ((email == "") || (validarEmail(email) == false)) {
-    msg = msg + "- Campo 'Correo Electronico' vacio o correo invalido <br />";
-    error = true;
-  }
-
   //Contraseñas
-  var pass1 = document.forms["registro"]["password1"].value;
-  var pass2 = document.forms["registro"]["password2"].value;
+  var pass1 = document.forms["modificar_datos_personales"]["password1"].value;
+  var pass2 = document.forms["modificar_datos_personales"]["password2"].value;
 
   if ((pass1 == "")) {
     msg = msg + "- Clave no es valida <br />";
@@ -381,7 +373,7 @@ function validarModificacion() {
   }
 
   //DNI titular tarjeta
-  var dnititular = document.forms["registro"]["titularTarj"].value;
+  var dnititular = document.forms["modificar_datos_personales"]["titularTarj"].value;
 
   if ((dnititular == "")) {
     msg = msg + "- Por favor ingrese el DNI del titular de la tarjeta <br />";
@@ -389,7 +381,7 @@ function validarModificacion() {
   }
 
   //Numero de tarjeta de credito
-  var num_tarjeta = document.forms["registro"]["numero_de_tarjeta"].value;
+  var num_tarjeta = document.forms["modificar_datos_personales"]["numero_de_tarjeta"].value;
 
   if ((num_tarjeta.toString().length != 16)) {
     msg = msg + "- El numero de tarjeta ingresado no es valido <br />";
@@ -397,7 +389,7 @@ function validarModificacion() {
   }
 
   //Nombre y apellido del titular tarjeta
-  var nombre_titular = document.forms["registro"]["nombre_titular_tarjeta"].value;
+  var nombre_titular = document.forms["modificar_datos_personales"]["nombre_titular_tarjeta"].value;
 
   if ((nombre_titular == "")) {
     msg = msg + "- Por favor ingrese el nombre y apellido del titular de la tarjeta <br />";
@@ -405,7 +397,7 @@ function validarModificacion() {
   }
 
   //Numero CVC de tarjeta
-  var cvc_tarjeta = document.forms["registro"]["cvc_tarj"].value;
+  var cvc_tarjeta = document.forms["modificar_datos_personales"]["cvc_tarj"].value;
 
   if ((cvc_tarjeta.toString().length != 3)) {
     msg = msg + "- El numero de CVC ingresado no es valido <br />";
@@ -427,7 +419,7 @@ function validarModificacion() {
   var anioVenc = anio_seleccionado.value;
 
   if (anioVenc < anioAct || (anioVenc == anioAct && mesVenc < mesAct)) {
-    msg = msg + "- La tarjeta de crédito está vencida, imposible realizar transacción <br />";
+    msg = msg + "- La tarjeta de crédito está vencida, intente con una nueva <br />";
     error = true;
   }
 
@@ -468,6 +460,28 @@ function validarNuevoPerfil() {
 
   //Nombre de perfil
   var x = document.forms["agregar_profile"]["profile_name"].value;
+
+  if ((x == "") || (validarTexto(x) == false)) {
+    msg = msg + "- Campo 'Nombre' vacio o nombre invalido <br />";
+    error = true;
+  }
+
+  if (error == true) {
+    document.getElementById("los_errores").innerHTML = msg;
+    document.getElementById("hay_errores").innerHTML = "Se han encontrado errores en el formulario. Revísalo e intenta de nuevo.";
+    return false;
+  }
+  return true;
+
+}
+
+
+function validarModificacionPerfil() {
+  var msg = ''
+  var error = false;
+
+  //Nombre de perfil
+  var x = document.forms["modificando_el_perfil"]["profile_name"].value;
 
   if ((x == "") || (validarTexto(x) == false)) {
     msg = msg + "- Campo 'Nombre' vacio o nombre invalido <br />";

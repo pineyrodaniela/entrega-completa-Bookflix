@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %} Modifica el perfil seleccionado {% endblock %}
+{% block content %}
+
+<section id="account">
+
+  <h1>Modifica el perfil</h1>
+
+      <p id="los_errores" style="color: red; font-weight: bold;"></p>
+
+      <form name="modificando_el_perfil" method="post" action="{{ url_for('modificando_perfil') }}" onsubmit="return validarModificacionPerfil()">
+
+    		<div class="form-group">
+          <label for="nombre_perf">Nombre </label>
+          <input type="text" class="form-control" value="{{perfil.nombre_perfil}}" id="nombre_perf" name="profile_name">
+        </div>
+
+        <!-- Formulario para elegir el avatar -->
+        <h3 class="eligeUnAvatar"> Elige un avatar </h3>
+
+        <!-- Lista de Avatares como imagenes -->
+        <div class="row">
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarBorges.png" alt="Avatar" class="avatar">
+            <h5>Jorge Luis Borges</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarCortazar.png" alt="Avatar" class="avatar">
+            <h5>Julio Cortázar</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarRowling.png" alt="Avatar" class="avatar">
+            <h5>J. K. Rowling</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarStephen.png" alt="Avatar" class="avatar">
+            <h5>Stephen King</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarHemingway.png" alt="Avatar" class="avatar">
+            <h5>Ernest Hemingway</h5>
+          </div>
+
+          <div class="feature-box-avatar-imgs col-lg-2">
+            <img src="../static/imgs/avataresPerfil/avatarMarquez.png" alt="Avatar" class="avatar">
+            <h5>Gabriel García Márquez</h5>
+          </div>
+        </div>
+
+        <br  />
+        <br  />
+
+    		<div class="form-group">
+          <label for="imagen_perf">Selecciona un avatar </label>
+          <select id="avatar_de_perfil" class="form-control" name="profile_avatar" title="Elige un Avatar">
+            <option value="{{perfil.imagen_de_perfil}}" selected>Avatar Actual</option>
+            <option value="../static/imgs/avataresPerfil/avatarBorges.png">Jorge Luis Borges</option>
+            <option value="../static/imgs/avataresPerfil/avatarCortazar.png">Julio Cortázar</option>
+            <option value="../static/imgs/avataresPerfil/avatarRowling.png">J. K. Rowling</option>
+            <option value="../static/imgs/avataresPerfil/avatarStephen.png">Stephen King</option>
+            <option value="../static/imgs/avataresPerfil/avatarHemingway.png">Ernest Hemingway</option>
+            <option value="../static/imgs/avataresPerfil/avatarMarquez.png">Gabriel García Márquez</option>
+          </select>
+        </div>
+
+    		<button type="submit" class="btn btn-success btn-lg">Modificar</button>
+        <p id="hay_errores" style="color: red; font-weight: bold;"></p>
+
+    	</form>
+
+</section>
+
+{% endblock %}

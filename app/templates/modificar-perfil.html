@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %} Modificar un perfil {% endblock %}
+
+{% block content %}
+
+<section id="account">
+
+  <h1>Modifica un perfil de tu cuenta</h1>
+
+    <form name="modificar_perfil" method="post" action="{{ url_for('modificar_perfil') }}">
+
+      <div class="form-group">
+        <label for="perfil_para_modificar">Selecciona el perfil que quieres modificar </label>
+        <select id="perfil_para_modificar" class="form-control" name="perfil_seleccionado" title="Elige un perfil">
+          {% for perfil_dict in perfiles %}
+            {% for key, value in perfil_dict.items() %}
+              <option value="{{value[1]}}">{{value[0]}}</option>
+            {% endfor %}
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-lg">Aceptar</button>
+
+    </form>
+
+</section>
+
+{% endblock %}
