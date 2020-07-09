@@ -70,18 +70,23 @@
               <li class="nav-item">
                 <a class="nav-link" href="/logout">Cerrar Sesión</a>
               </li>
+              <li><form method="POST" action="{{ url_for('search') }}" class="form-inline my-2 my-lg-0">
+                <div class="form-group">
+                  <label for="tipo_busqueda">Elige el criterio de busqueda </label>
+                  <select class="form-control" id="tipo_busqueda" name="tipo_b">
+                    <option value="libro">Libro</option>
+                    <option value="aut">Autor</option>
+                    <option value="gen">Genero</option>
+                  </select>
+                </div>
+              <li><form method="POST" action="/search" class="form-inline my-2 my-lg-0">
+                  <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Escribe autor, género, editorial" aria-label="Search" name="book">
+                  <button class="btn btn-sm btn-outline-danger my-2 my-sm-0" type="submit">Buscar</button>
+                </form>
+              </li>
             {% endif %}
           </ul>
 
-          <!-- <form class="form-inline my-2 my-lg-0">
-            <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Escribe autor, género, editorial" aria-label="Search">
-            <button class="btn btn-sm btn-outline-danger my-2 my-sm-0" type="submit">Buscar</button>
-          </form> -->
-
-          <form method="get" action="{{ url_for('search') }}" class="form-inline my-2 my-lg-0">
-            <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Escribe autor, género, editorial" aria-label="Search" name="book">
-            <button class="btn btn-sm btn-outline-danger my-2 my-sm-0" type="submit">Buscar</button>
-          </form>
 
         </div>
       </nav>

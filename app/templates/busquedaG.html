@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="pricing">
+<div class="content">     
+ 
+        <table class="table">
+            <tr>
+                <th>Genero</th>
+                <th>Titulo</th>
+                <th>Descripcion</th>
+            </tr>
+            {% for libro in librosGen %}
+            <tr>
+                <td>{{ genero.nomGenero }}</td>
+                <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
+                <td>{{ libro.descripcion }}</td>
+            </tr>
+            {% endfor %} 
+                </table>
+     
+    </div>
+      </section>
+    </body>
+
+
+
+{% endblock %}

@@ -19,6 +19,7 @@ class Users(db.Model):
     datetime_acceso = db.Column(db.String(200), nullable=True)
     tipo_de_usuario = db.Column(db.Integer, nullable=False)
     deleted_user = db.Column(db.String(5), nullable=False)
+    fecha_registro = db.Column(db.String(200), nullable=True)
 
 class Perfiles(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -53,6 +54,7 @@ class Libros(db.Model):
     tiene_trailer = db.Column(db.Integer, default=0)
     oculto = db.Column(db.Integer, nullable=False, default = 0)
     pathPortada = db.Column(db.String, default = "../static/imgs/Portadas\default\portadaDefault.jpg")
+    visualizaciones = db.Column(db.Integer)
 
 
 class Capitulos(db.Model):
@@ -93,3 +95,20 @@ class trailers(db.Model):
     nombre = db.Column(db.String, nullable=False)
     libro_id = db.Column(db.Integer, nullable=True)
     file = db.Column(db.String)
+
+class Historial(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    perfil_id = db.Column(db.Integer, nullable=False)
+    libro_id = db.Column(db.Integer, nullable=False)
+    capitulo_id = db.Column(db.Integer, nullable=True)
+
+class Valoracion(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    lib_id = db.Column(db.Integer, nullable= False)
+    user_id = db.Column(db.Integer, nullable= False)
+    perfil_id = db.Column(db.Integer, nullable= False)
+    puntuacion = db.Column(db.Integer)
+    comentario = db.Column(db.String(500))
+    fecha_valoracion = db.Column(db.DateTime, default= datetime.utcnow)
+    es_spoiler = db.Column(db.Integer, nullable=False, default = 0)
+    c_borrado = db.Column(db.Integer, nullable=False, default = 0)      

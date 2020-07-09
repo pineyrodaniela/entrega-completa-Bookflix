@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="pricing">
+<div class="content">           
+
+        <table class="table">
+            <tr>
+                <th>Autor</th>
+                <th>Titulo</th>
+                <th>Descripcion</th>
+            </tr>
+            {% for libro in librosAut %}
+            <tr>
+                <td>{{ libro[1].nomAutor }}</td>
+                <td><a href="mostrarLibro/{{libro[0][0].id}}">{{ libro[0][0].titulo }}</a></td>
+                <td>{{ libro[0][0].descripcion }}</td>
+            </tr>
+            {% endfor %}
+                </table>
+    </div>
+      </section>
+    </body>
+
+
+
+{% endblock %}

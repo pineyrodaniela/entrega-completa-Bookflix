@@ -7,8 +7,8 @@ import os, random
 from os import path
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import shutil, sys
-
+import shutil, sys                                                                                                                                                    
+import easygui as eg
 
 @app.route("/listarCapitulosUser/<int:LibroId>")
 def listarCapUser(LibroId):
@@ -70,15 +70,29 @@ def verCapitulo(LibroId,cap):
 
 @app.route("/hora")
 def hora():
+    dateAndTime = datetime.now()
+    date = dateAndTime
+
     libro = Libros.query.filter_by(id=3).first()
     fecL =  "08-03-1997"
     datetime_act = datetime.now()
     datetime_object = datetime.strptime(fecL, '%d-%m-%Y' )
 
-    return render_template("hora.html", fecL = datetime_object, datetime_act = datetime_act)
+    return render_template("hora.html", fecL = datetime_object, datetime_act = datetime_act, date = date)
 
-@app.route("/mostrarLibro/<int:n>")
+@app.route("/mostrarLibro/<int:n>", methods= ["GET", "POST"])
 def mostrarLibro(n):
+    valoraciones = valoracion.query.filter_by(lib_id=n).all()
+    
+    prom = 0
+    tot = 0
+    for p in valoraciones:
+        prom = prom + p.puntuacion
+        tot = tot+1
+    if tot != 0:
+        prom = prom / tot
+    
+    traerPer = Perfiles.query.all()
     libro = Libros.query.get_or_404(n)
     capitulos = Capitulos.query.filter_by(lib_id=n).first()
     aut = Autores.query.filter_by(id = libro.autor_id).first()
@@ -86,7 +100,12 @@ def mostrarLibro(n):
     gen = Generos.query.filter_by(id = libro.genero_id).first()
     datetime_act = datetime.now()
 
-    yaEnFavoritos = False
+    if libro.tiene_trailer:
+        trailerL = trailers.query.filter_by(libro_id=libro.id).first()
+    else:
+        trailerL = ""
+
+     yaEnFavoritos = False
     if "perfilElegido" in session:
         favoritos_delPerfil = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
         for libro_fav in favoritos_delPerfil:
@@ -95,11 +114,26 @@ def mostrarLibro(n):
                 if libroAct.titulo == libro.titulo:
                     yaEnFavoritos = True
 
-    if libro.tiene_trailer:
-        trailerL = trailers.query.filter_by(libro_id=libro.id).first()
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
-    else:
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
+    if request.method == "POST":
+        if ("rating" in request.form):
+            nue_com = valoracion(lib_id = n, perfil_id = session["perfilElegido"], puntuacion = request.form['rating'],comentario = request.form['comentario'], fecha_valoracion = datetime.now())
+            db.session.add(nue_com)
+            db.session.commit()
+            flash("Comentario publicado", "success")
+            valoraciones = valoracion.query.filter_by(lib_id=n).all()
+
+            for p in valoraciones:
+                prom = prom + p.puntuacion
+                tot = tot+1
+            if tot != 0:
+                prom = prom / tot
+
+            return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
+        else:
+            flash("No se seleccionó una valoracion", "error")
+    
+    return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
+
 
 @app.route("/borrarLibro/<int:n>", methods= ["GET", "POST"])
 def borrarLibro(n):
@@ -487,7 +521,9 @@ def signup_premium():
                               mes_venc=request.form["exMonth"],
                               anio_venc=request.form["exYear"],
                               tipo_de_usuario=2,
-                              deleted_user="False")
+                              deleted_user="False",
+                              fecha_registro= datetime.now())
+
 
             db.session.add(new_user)
             db.session.commit()
@@ -542,7 +578,8 @@ def signup_standard():
                               mes_venc=request.form["exMonth"],
                               anio_venc=request.form["exYear"],
                               tipo_de_usuario=1,
-                              deleted_user="False")
+                              deleted_user="False",
+                              fecha_registro= datetime.now())
 
             db.session.add(new_user)
             db.session.commit()
@@ -1210,19 +1247,67 @@ def borrarT(id):
         flash("Trailer borrado", "success")
         return redirect('/BorrarTrailersAdm')
 
+
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         tag = request.form["book"]
-        search = "%{}%".format(tag)
-        libro = Libros.query.filter(Libros.titulo.ilike(search)).all()
-        autor = Autores.query.filter(Autores.nomAutor.ilike(search)).first()
-        genero = Generos.query.filter(Generos.nomGenero.ilike(search)).first()
-        if (autor != None):
-            librosAut = Libros.query.filter_by(autor_id=autor.id).all()
-            return render_template("busqueda.html", autor=autor, librosAut=librosAut, genero=genero, libro= libro)
-        elif genero != None:
-            librosGen = Libros.query.filter_by(genero_id=genero.id).all()
-            return render_template("busqueda.html", genero=genero, librosGen=librosGen, autor=autor, libro=libro )
-        else:
-            return render_template("busqueda.html", libro=libro, genero=genero, autor=autor)
+        if tag == "":
+            flash ("La busqueda no arrojo ningun resultado", "error")
+            return redirect("/")
+        else:    
+            search = "%{}%".format(tag)
+            tipo = request.form["tipo_b"]
+            if tipo == "libro":
+                libro = Libros.query.filter(Libros.titulo.ilike(search)).all()
+                libros = []
+                for i in libro:
+                    aut = (Autores.query.filter_by(id=i.autor_id).first())
+                    libros.append([aut, i])  
+                return render_template("busquedaL.html", libros=libros)
+            elif tipo == "aut": 
+                autor = Autores.query.filter(Autores.nomAutor.ilike(search)).all()
+                librosAut = []
+                for i in autor:
+                    libA = (Libros.query.filter_by(autor_id=i.id).all())
+                    librosAut.append([libA, i])     
+                return render_template("busquedaA.html", librosAut=librosAut)
+            elif tipo == "gen":    
+                genero = Generos.query.filter(Generos.nomGenero.ilike(search)).first() 
+                librosGen = (Libros.query.filter_by(genero_id=genero.id).all())             
+                return render_template("busquedaG.html", librosGen=librosGen, genero=genero)        
+   
+@app.route("/verComentariosAdm")
+def verComentariosAdm():
+    comentarios = Valoracion.query.order_by(Valoracion.fecha_valoracion.desc()).all()
+    lista = []
+    for i in comentarios:
+        lib = (Libros.query.filter_by(id=i.lib_id).first())
+        lista.append([lib, i])
+    return render_template("verComentariosAdm.html", lista=lista)
+
+@app.route("/borrarComentario/<int:id>")
+def borrarComentario(id):
+    comentario_a_borrar = Valoracion.query.get_or_404(id)
+    comentario_a_borrar.comentario = ""
+    comentario_a_borrar.c_borrado = 1
+    db.session.commit()
+    flash ("comentario borrado con exito", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/marcarSpoiler/<int:id>")    
+def marcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 1
+    db.session.commit()
+    flash ("Comentario marcado como spoiler", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/desmarcarSpoiler/<int:id>")    
+def desmarcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 0
+    db.session.commit()
+    flash ("Comentario desmarcado", "success")
+    return redirect('/verComentariosAdm')    
+                    
