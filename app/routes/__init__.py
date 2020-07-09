@@ -22,6 +22,22 @@ def verPDF(LibroId):
     libro = Libros.query.filter_by(id=LibroId).first()
     capitulo = Capitulos.query.filter_by(lib_id=LibroId).first()
     pathF = capitulo.path + "\\" + capitulo.nomCap + "#toolbar=0"
+
+    # Guardar libro en Historial de ese perfil
+    if "perfilElegido" in session:
+        #Controlar que ese libro no este ya guardado en el historial de ese perfil
+        estaYaEnHistorial = False
+        historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for book in historial_perfilActual:
+            if (book.libro_id == LibroId):
+                estaYaEnHistorial = True
+
+        if not estaYaEnHistorial:
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+                                        libro_id = LibroId)
+            db.session.add(nuevo_historial)
+            db.session.commit()
+
     return render_template("vistaPDF.html", pathF = pathF)
 
 @app.route("/verCapitulo/<int:LibroId>/<int:cap>")
@@ -29,6 +45,27 @@ def verCapitulo(LibroId,cap):
     libro = Libros.query.filter_by(id=LibroId).first()
     capitulo = Capitulos.query.filter_by(lib_id=LibroId,numCap = cap).first()
     pathF = capitulo.path + "\\" + capitulo.nomCap + "\\"
+
+    # Guardar capítulo del libro en Historial de ese perfil
+    if "perfilElegido" in session:
+        # Si el libro ya está, actualizar solamente el capítulo
+        yaEnHistoriall = False
+        historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for book in historial_perfilActual:
+            if (book.libro_id == LibroId):
+                yaEnHistoriall = True
+                if (book.capitulo_id != cap):
+                    book.capitulo_id = cap
+                    db.session.commit()
+                    # Capitulo actualizado
+
+        if not yaEnHistoriall:
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+                                        libro_id = LibroId,
+                                        capitulo_id = cap)
+            db.session.add(nuevo_historial)
+            db.session.commit()
+
     return render_template("vistaPDF.html", pathF = pathF)
 
 @app.route("/hora")
@@ -628,7 +665,21 @@ def index():
 
                     l.append(dic)
 
-            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l)
+            #Buscar el historial de ese perfil
+            historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+            libros_historial = []
+            for libroHist in historial_perfilActual:
+                libroHistorial = Libros.query.filter_by(id=libroHist.libro_id).first()
+                dicHist = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_capitulo": 0}
+                dicHist["titulo_libro"] = libroHistorial.titulo
+                dicHist["cantidad_de_capitulos"] = libroHistorial.cantCapTotales
+                dicHist["id_libro"] = libroHistorial.id
+                if libroHistorial.capSubidosAct > 1:
+                    dicHist["id_capitulo"] = libroHist.capitulo_id
+
+                libros_historial.append(dicHist)
+
+            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l, libros_historial=libros_historial)
         else:
             return redirect(url_for("elige_un_perfil"))
     else:
