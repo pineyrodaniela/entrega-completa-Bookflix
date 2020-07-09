@@ -19,6 +19,7 @@ class Users(db.Model):
     datetime_acceso = db.Column(db.String(200), nullable=True)
     tipo_de_usuario = db.Column(db.Integer, nullable=False)
     deleted_user = db.Column(db.String(5), nullable=False)
+    fecha_registro = db.Column(db.String(200), nullable=True)
 
 class Perfiles(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -32,6 +33,12 @@ class Favoritos(db.Model):
     perfil_id = db.Column(db.Integer, nullable=False)
     libro_id = db.Column(db.Integer, nullable=False)
     favorito_borrado = db.Column(db.String(5), nullable=False)
+
+class Historial(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    perfil_id = db.Column(db.Integer, nullable=False)
+    libro_id = db.Column(db.Integer, nullable=False)
+    capitulo_id = db.Column(db.Integer, nullable=True)
 
 class Libros(db.Model):
     id = db.Column(db.Integer, primary_key = True)

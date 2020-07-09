@@ -22,6 +22,22 @@ def verPDF(LibroId):
     libro = Libros.query.filter_by(id=LibroId).first()
     capitulo = Capitulos.query.filter_by(lib_id=LibroId).first()
     pathF = capitulo.path + "\\" + capitulo.nomCap + "#toolbar=0"
+
+    # Guardar libro en Historial de ese perfil
+    if "perfilElegido" in session:
+        #Controlar que ese libro no este ya guardado en el historial de ese perfil
+        estaYaEnHistorial = False
+        historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for book in historial_perfilActual:
+            if (book.libro_id == LibroId):
+                estaYaEnHistorial = True
+
+        if not estaYaEnHistorial:
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+                                        libro_id = LibroId)
+            db.session.add(nuevo_historial)
+            db.session.commit()
+
     return render_template("vistaPDF.html", pathF = pathF)
 
 @app.route("/verCapitulo/<int:LibroId>/<int:cap>")
@@ -29,19 +45,54 @@ def verCapitulo(LibroId,cap):
     libro = Libros.query.filter_by(id=LibroId).first()
     capitulo = Capitulos.query.filter_by(lib_id=LibroId,numCap = cap).first()
     pathF = capitulo.path + "\\" + capitulo.nomCap + "\\"
+
+    # Guardar capítulo del libro en Historial de ese perfil
+    if "perfilElegido" in session:
+        # Si el libro ya está, actualizar solamente el capítulo
+        yaEnHistoriall = False
+        historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for book in historial_perfilActual:
+            if (book.libro_id == LibroId):
+                yaEnHistoriall = True
+                if (book.capitulo_id != cap):
+                    book.capitulo_id = cap
+                    db.session.commit()
+                    # Capitulo actualizado
+
+        if not yaEnHistoriall:
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+                                        libro_id = LibroId,
+                                        capitulo_id = cap)
+            db.session.add(nuevo_historial)
+            db.session.commit()
+
     return render_template("vistaPDF.html", pathF = pathF)
 
 @app.route("/hora")
 def hora():
+    dateAndTime = datetime.now()
+    date = dateAndTime
+
     libro = Libros.query.filter_by(id=3).first()
     fecL =  "08-03-1997"
     datetime_act = datetime.now()
     datetime_object = datetime.strptime(fecL, '%d-%m-%Y' )
 
-    return render_template("hora.html", fecL = datetime_object, datetime_act = datetime_act)
+    return render_template("hora.html", fecL = datetime_object, datetime_act = datetime_act, date = date)
 
-@app.route("/mostrarLibro/<int:n>")
+@app.route("/mostrarLibro/<int:n>", methods= ["GET", "POST"])
 def mostrarLibro(n):
+    valoraciones = valoracion.query.filter_by(lib_id=n).all()
+    
+    prom = 0
+    tot = 0
+    for p in valoraciones:
+        prom = prom + p.puntuacion
+        tot = tot+1
+    if tot != 0:
+        prom = prom / tot
+    
+    traerPer = Perfiles.query.all()
     libro = Libros.query.get_or_404(n)
     capitulos = Capitulos.query.filter_by(lib_id=n).first()
     aut = Autores.query.filter_by(id = libro.autor_id).first()
@@ -49,7 +100,12 @@ def mostrarLibro(n):
     gen = Generos.query.filter_by(id = libro.genero_id).first()
     datetime_act = datetime.now()
 
-    yaEnFavoritos = False
+    if libro.tiene_trailer:
+        trailerL = trailers.query.filter_by(libro_id=libro.id).first()
+    else:
+        trailerL = ""
+
+     yaEnFavoritos = False
     if "perfilElegido" in session:
         favoritos_delPerfil = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
         for libro_fav in favoritos_delPerfil:
@@ -58,11 +114,26 @@ def mostrarLibro(n):
                 if libroAct.titulo == libro.titulo:
                     yaEnFavoritos = True
 
-    if libro.tiene_trailer:
-        trailerL = trailers.query.filter_by(libro_id=libro.id).first()
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
-    else:
-        return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, datetime_act = datetime_act, yaEnFavoritos=yaEnFavoritos)
+    if request.method == "POST":
+        if ("rating" in request.form):
+            nue_com = valoracion(lib_id = n, perfil_id = session["perfilElegido"], puntuacion = request.form['rating'],comentario = request.form['comentario'], fecha_valoracion = datetime.now())
+            db.session.add(nue_com)
+            db.session.commit()
+            flash("Comentario publicado", "success")
+            valoraciones = valoracion.query.filter_by(lib_id=n).all()
+
+            for p in valoraciones:
+                prom = prom + p.puntuacion
+                tot = tot+1
+            if tot != 0:
+                prom = prom / tot
+
+            return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
+        else:
+            flash("No se seleccionó una valoracion", "error")
+    
+    return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
+
 
 @app.route("/borrarLibro/<int:n>", methods= ["GET", "POST"])
 def borrarLibro(n):
@@ -450,7 +521,9 @@ def signup_premium():
                               mes_venc=request.form["exMonth"],
                               anio_venc=request.form["exYear"],
                               tipo_de_usuario=2,
-                              deleted_user="False")
+                              deleted_user="False",
+                              fecha_registro= datetime.now())
+
 
             db.session.add(new_user)
             db.session.commit()
@@ -505,7 +578,8 @@ def signup_standard():
                               mes_venc=request.form["exMonth"],
                               anio_venc=request.form["exYear"],
                               tipo_de_usuario=1,
-                              deleted_user="False")
+                              deleted_user="False",
+                              fecha_registro= datetime.now())
 
             db.session.add(new_user)
             db.session.commit()
@@ -628,7 +702,21 @@ def index():
 
                     l.append(dic)
 
-            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l)
+            #Buscar el historial de ese perfil
+            historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+            libros_historial = []
+            for libroHist in historial_perfilActual:
+                libroHistorial = Libros.query.filter_by(id=libroHist.libro_id).first()
+                dicHist = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_capitulo": 0}
+                dicHist["titulo_libro"] = libroHistorial.titulo
+                dicHist["cantidad_de_capitulos"] = libroHistorial.cantCapTotales
+                dicHist["id_libro"] = libroHistorial.id
+                if libroHistorial.capSubidosAct > 1:
+                    dicHist["id_capitulo"] = libroHist.capitulo_id
+
+                libros_historial.append(dicHist)
+
+            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l, libros_historial=libros_historial)
         else:
             return redirect(url_for("elige_un_perfil"))
     else:

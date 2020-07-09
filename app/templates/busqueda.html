@@ -1,19 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 <section id="pricing">
-<div class="content">
+<div class="content">     
 {% if libro != None and autor == None and genero == None %}
 <table class="table">
     <tr>
         <th>Titulo</th>
         <th>Descripcion</th>
-        <th>Cantidad de páginas</th>
     </tr>
     {% for libro in libro %}
     <tr>
-        <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
-        <td>{{ libro.descripcion }}</td>
-        <td>{{ libro.cantidad_de_paginas }}</td>
+        <td><a href="mostrarLibro/{{libro[0].id}}">{{ libro[0].titulo }}</a></td>
+        <td>{{ libro[0].descripcion }}</td>
     </tr>
     {% endfor %}
         </table>
@@ -25,14 +23,12 @@
                 <th>Autor</th>
                 <th>Titulo</th>
                 <th>Descripcion</th>
-                <th>Cantidad de páginas</th>
             </tr>
             {% for libro in librosAut %}
             <tr>
-                <td>{{ autor.nomAutor }}</td>
-                <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
-                <td>{{ libro.descripcion }}</td>
-                <td>{{ libro.cantidad_de_paginas}}</td>
+                <td>{{ libro[1].nomAutor }}</td>
+                <td><a href="mostrarLibro/{{libro[0][0].id}}">{{ libro[0][0].titulo }}</a></td>
+                <td>{{ libro[0][0].descripcion }}</td>
             </tr>
             {% endfor %}
                 </table>
@@ -44,14 +40,12 @@
                 <th>Genero</th>
                 <th>Titulo</th>
                 <th>Descripcion</th>
-                <th>Cantidad de páginas</th>
             </tr>
             {% for libro in librosGen %}
             <tr>
-                <td>{{ genero.nomGenero }}</td>
-                <td><a href="mostrarLibro/{{libro.id}}">{{ libro.titulo }}</a></td>
-                <td>{{ libro.descripcion }}</td>
-                <td>{{ libro.cantidad_de_paginas}}</td>
+                <td>{{ libro[1].nomGenero }}</td>
+                <td><a href="mostrarLibro/{{libro[0][0].id}}">{{ libro[0][0].titulo }}</a></td>
+                <td>{{ libro[0][0].descripcion }}</td>
             </tr>
             {% endfor %}
                 </table>

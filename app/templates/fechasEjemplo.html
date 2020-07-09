@@ -1,0 +1,48 @@
+{% extends "admin.html" %}
+{% block content %}
+<div id="account" style="
+padding-top: 10px">
+    <h4>Buscar suscriptores entre fechas</h4>
+    <form name="buscarSubs" method="POST" class="agLib">
+        <label>Fecha 1</label><br>
+
+        <input style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="fecha1" type="date"><br><br>
+
+        <label>Fecha 2</label><br>
+        <input style="margin: 0 auto;" class="col-lg-4 col-lg-offset-4; form-control" name="fecha2" type="date"><br><br><br>
+
+        <button class="btn btn-primary">Buscar</button>
+
+    </form>
+        {% if users %}
+            <table class="table table-hover table-dark">
+                <thead>
+                <tr>
+                    <th scope="col" style="text-align: center;">Nombre y Apellido</th>
+                    <th scope="col" style="text-align: center;">Correo</th>
+                    <th scope="col" style="text-align: center;">Fecha de registro</th>
+                    <th scope="col" style="text-align: center;">Ultima vez conectado</th>
+                    <th scope="col" style="text-align: center;">Tipo de usuario</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for u in users %}
+                <tr style="background-color: #1D1B1C">
+                    <td style="text-align: center;">{{u.nombre }}  {{u.apellido}} </td>
+                    <td style="text-align: center;">{{u.correo}}</td>
+                    <td style="text-align: center;">{{u.fecha_registro|strftime}}</td>
+                    <td style="text-align: center;">{{u.datetime_acceso|time}}
+                    </td>
+                    {% if u.tipo_de_usuario == 1 %}
+                        <td style="text-align: center;" >Standard</td>
+                    {% else %}
+                    <td style="text-align: center;" >Premium</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+</div>
+{% endblock %}
+

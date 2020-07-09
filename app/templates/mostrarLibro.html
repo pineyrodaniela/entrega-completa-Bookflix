@@ -2,6 +2,18 @@
 
 
 {% block content %}
+
+<script>
+    $( document ).ready(function() {
+      $(".xd2").click(function(){
+        id=$(this).attr("idCom")
+        idLib=$(this).attr("libId")
+        $("#"+id).modal();
+    });
+    });
+    
+</script>
+
 <section id="title">
     <div class="container">
     <h2 style="text-align: center;">Titulo: {{l.titulo}}</h2>
@@ -15,11 +27,25 @@
             <h6>Genero: {{gen.nomGenero}}</h6><br>
             <h6>Autor: {{aut.nomAutor}}</h6><br>
             <h6>Editorial: {{edit.nomEditorial}}</h6><br>
+            
             <h6>Cantidad de paginas: {{c.cantidad_de_paginas}}</h6>
+                    
+        </div>
+        <div style="margin-left: 10%; margin-top: 13%;" >
+            {% if prom > 0%}
+                <h5>Puntuacion promedio: {{prom|float}} <i style="color: gold;" class="fas fa-star"></i></h5>
+            {% else %}
+                <h5>Este libro aún no tuvo reseñas</h5>
+            {% endif %}
+        
         </div>
     </div>
+
+
+
     <div class="container" style="text-align: center; margin-top: 3%;">
     <div>
+    <!--comparaciones para ver qué boton mostrar-->
     {% if l.capSubidosAct == 0 %}
     <a type="button" class="btn btn-primary btn-lg">Proximamente</a>
     {% elif datetime_act > c.fecha_vencimiento %}
@@ -47,7 +73,7 @@
       {% endif %}
     {% endif %}
 
-    {% if trailerL %}
+    {% if trailerL|length %}
     <form action="/trailersU" method="POST">
         <input  type="hidden" name="nombre" value="{{trailerL.nombre}}">
         <input type="submit" class="btn btn-secondary btn-lg" value="Ver trailer">
@@ -55,5 +81,122 @@
     {% endif %}
     </div><br>
     </div>
-</section>
+</section>  
+
+
+<!--toogle-->
+<div class="accordion accordion-icons" id="accordionExample">
+    <div class="card">
+      <div class="card-header" id="headingThree">
+        <h5 class="mb-0">
+          <a class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+             <i class='fas fa-chevron-down'></i>
+          </a>
+          Mostrar comentarios
+        </h5>
+      </div>
+      <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+        <!-- comienzo de comentarios-->
+
+        <!-- agregar condicional para los perfiles que ya comentaron --->
+            <h4 style="text-align: center;">¿Qué te pareció el libro?</h4>
+        
+        <form name="ratingLibro" method="POST" class="agLib">
+            
+            <label style="margin-left: 3%;" for="exampleFormControlTextarea1">Deja un comentario y valora el libro</label>
+            <div class="container">
+                <div class="row">
+                <div class="rating">
+                  <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Muy bueno">5 stars</label>
+                  <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Bueno">4 stars</label>
+                  <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="Regular">3 stars</label>
+                  <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Malo">2 stars</label>
+                  <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Muy malo">1 star</label>
+                </div>
+                </div>
+            </div>   
+
+    
+        <div class="col-lg-6 col-lg-offset-4; form-group">
+            
+            <textarea class="form-control" name="comentario" id="exampleFormControlTextarea1" rows="3" ></textarea>
+          </div>
+
+          <button type="submit" style="margin-left: 43%;" class="btn btn-success"> Valorar</button>
+        </form>
+
+
+
+        <div class="row d-flex justify-content-center mt-100 mb-100">
+            <div class="col-lg-6">
+                <div class="card">
+                    {% if valoraciones|length %}
+                        {% for v in valoraciones %}
+                        <!--modal-->
+                        <div class="modal fade modalGenerico" id="{{v.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 style="color: #1D1B1C;" class="modal-title" id="exampleModalLongTitle">¿Estás seguro de borrar tu comentario?</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div style="color: #1D1B1C;" class="modal-body">
+                                  Esta acción no se puede deshacer
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                  <a href="/borrarComentario/{{v.id}}/{{l.id}}" idCom ="{{v.id}}" class="btn btn-danger" role="button" >Confirmar</a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!--fin modal-->
+
+                        <div class="comment-widgets">
+                            <!-- Comment Row -->
+                            <div class="d-flex flex-row comment-row m-t-0">
+                                <div class="p-2"><img src= {{ traerPer[v.perfil_id-1].imagen_de_perfil }} alt="user" width="50" class="rounded-circle"></div>
+                                <div class="comment-text w-100">
+                                    <h6 class="font-medium">{{traerPer[v.perfil_id-1].nombre_perfil}} 
+                                      {% for i in range(v.puntuacion) %} 
+                                        <i style="color: gold;" class="fas fa-star"></i> 
+                                      {% endfor %}
+                                    </h6> 
+
+                                    {% if v.es_spoiler == 0 or v.perfil_id == session["perfilElegido"]|int %}
+                                      <span class="m-b-15 d-block">{{v.comentario}}
+                                        {% if v.perfil_id == session["perfilElegido"]|int %}
+                                        <button idCom ="{{v.id}}" libId={{l.id}} class="btn btn-danger btn-sm xd2" style="float: right;">Borrar comentario</button>
+                                        {% endif %} 
+                                      </span>
+                                    {% else %}
+                                      <span class="m-b-15 d-block"><details><summary><b>Este comentario tiene spoiler.</b></summary>{{v.comentario}}</details>
+                                        {% if v.perfil_id == session["perfilElegido"]|int %}
+                                        <button idCom ="{{v.id}}" libId={{l.id}} class="btn btn-danger btn-sm xd2" style="float: right;">Borrar comentario</button>
+                                        {% endif %} 
+                                      </span>
+                                    {% endif %}
+
+                                    <div class="comment-footer"> <span class="text-muted float-right">{{v.fecha_valoracion}}</span></div>
+                                </div>
+                            </div> <!-- Comment Row -->
+                        </div> <!-- Card -->
+                        {% endfor %}
+                    {% else %}
+                        <div class="card-body text-center">
+                            <h4 class="card-title">No hay comentarios en este libro</h4>
+                        </div>                    
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- fin de comentarios-->
+
+<!--toogle-->
+
+      </div>
+    </div>
+  </div>
 {% endblock %}

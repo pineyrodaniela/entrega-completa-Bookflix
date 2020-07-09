@@ -18,6 +18,8 @@
   <!--CSS Stylesheets-->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/comments.css') }}" />
+
 
   <!--Font Awesome-->
   <script src="https://kit.fontawesome.com/00c08c8a5e.js" crossorigin="anonymous"></script>
@@ -40,7 +42,7 @@
 
 </head>
 
-<body>
+<body id="title">
 
   {{ login_logout_deleted_messages(messages) }}
 
@@ -87,6 +89,7 @@
                     <option value="gen">Genero</option>
                   </select>
                 </div>
+              <li><form method="POST" action="/search" class="form-inline my-2 my-lg-0">
                 <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Escribe autor, género, editorial" aria-label="Search" name="book">
                 <button class="btn btn-sm btn-outline-danger my-2 my-sm-0" type="submit">Buscar</button>
               </form>
