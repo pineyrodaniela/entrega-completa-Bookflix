@@ -499,9 +499,7 @@ function validarEmail(mail) {
   return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/.test(mail);
 }
 
-function validarTextoAlfanumerico(alfanum){
-  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%#*?&])([A-Za-z\d$@$!%#*?&]$/.test(alfanum);
-}
+
 function validarContraseña(contraseña) {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%#*?&])([A-Za-z\d$@$!%#*?&]|[^ ]){6,}$/.test(contraseña);
 }

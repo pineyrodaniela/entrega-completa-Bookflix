@@ -19,6 +19,7 @@ class Users(db.Model):
     datetime_acceso = db.Column(db.String(200), nullable=True)
     tipo_de_usuario = db.Column(db.Integer, nullable=False)
     deleted_user = db.Column(db.String(5), nullable=False)
+    fecha_registro = db.Column(db.String(200), nullable=True)
 
 class Perfiles(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -26,6 +27,12 @@ class Perfiles(db.Model):
     nombre_perfil = db.Column(db.String(25), nullable=False)
     imagen_de_perfil = db.Column(db.String(150), nullable=False)
     perfil_borrado = db.Column(db.String(5), nullable=False)
+
+class Favoritos(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    perfil_id = db.Column(db.Integer, nullable=False)
+    libro_id = db.Column(db.Integer, nullable=False)
+    favorito_borrado = db.Column(db.String(5), nullable=False)
 
 class Libros(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -81,3 +88,23 @@ class trailers(db.Model):
     nombre = db.Column(db.String, nullable=False)
     libro_id = db.Column(db.Integer, nullable=True)
     file = db.Column(db.String)
+
+class historial(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    lib_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    perfil_id = db.Column(db.Integer)
+    fecha_lectura = db.Column(db.DateTime)
+
+
+
+class valoracion(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    lib_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    perfil_id = db.Column(db.Integer)
+    puntuacion = db.Column(db.Integer)
+    comentario = db.Column(db.String(500))
+    fecha_valoracion = db.Column(db.DateTime)
+    es_spoiler = db.Column(db.Integer)
+    c_borrado = db.Column(db.Integer)
