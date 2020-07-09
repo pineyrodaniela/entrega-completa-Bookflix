@@ -14,6 +14,9 @@
   <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
+  <!--Font Awesome-->
+  <script src="https://kit.fontawesome.com/00c08c8a5e.js" crossorigin="anonymous"></script>
+
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
@@ -43,7 +46,7 @@
           {% if key != "id_de_perfil" %}
             <form name="elegir_perfil_lectura" method="post" action="{{ url_for('elige_un_perfil') }}">
               <button type="submit" class="btn btn-outline-light">{{value}}</button>
-              <input style="display: none;" type="number" name="id_del_perfil_elegido" value="{{ perfil_dict['id_de_perfil'] }}">
+              <input style="display: none;" type="text" name="id_del_perfil_elegido" value="{{ perfil_dict['id_de_perfil'] }}">
             </form>
           {% endif %}
         {% endif %}
@@ -53,6 +56,8 @@
       <br />
       <br />
     {% endfor %}
+
+    <a href="{{ url_for('perfiles') }}"><button type="button" name="button" class="btn btn-primary btn-md"><i class="far fa-user"></i>  Ir a la página de perfiles</button></a>
 
   </div>
 

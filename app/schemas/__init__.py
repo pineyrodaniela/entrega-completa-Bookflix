@@ -34,6 +34,12 @@ class Favoritos(db.Model):
     libro_id = db.Column(db.Integer, nullable=False)
     favorito_borrado = db.Column(db.String(5), nullable=False)
 
+class Historial(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    perfil_id = db.Column(db.Integer, nullable=False)
+    libro_id = db.Column(db.Integer, nullable=False)
+    capitulo_id = db.Column(db.Integer, nullable=True)
+
 class Libros(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     titulo = db.Column(db.String(50))
@@ -49,7 +55,7 @@ class Libros(db.Model):
     oculto = db.Column(db.Integer, nullable=False, default = 0)
     pathPortada = db.Column(db.String, default = "../static/imgs/Portadas\default\portadaDefault.jpg")
 
-    
+
 class Capitulos(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nomCap = db.Column(db.String(200))
@@ -89,22 +95,20 @@ class trailers(db.Model):
     libro_id = db.Column(db.Integer, nullable=True)
     file = db.Column(db.String)
 
-class historial(db.Model):
+class Historial(db.Model):
     id = db.Column(db.Integer, primary_key= True)
     lib_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer)
     perfil_id = db.Column(db.Integer)
-    fecha_lectura = db.Column(db.DateTime)
+    fecha_lectura = db.Column(db.DateTime, default=datetime.utcnow)
 
-
-
-class valoracion(db.Model):
+class Valoracion(db.Model):
     id = db.Column(db.Integer, primary_key= True)
-    lib_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer)
-    perfil_id = db.Column(db.Integer)
+    lib_id = db.Column(db.Integer, nullable= False)
+    user_id = db.Column(db.Integer, nullable= False)
+    perfil_id = db.Column(db.Integer, nullable= False)
     puntuacion = db.Column(db.Integer)
     comentario = db.Column(db.String(500))
-    fecha_valoracion = db.Column(db.DateTime)
-    es_spoiler = db.Column(db.Integer)
-    c_borrado = db.Column(db.Integer)
+    fecha_valoracion = db.Column(db.DateTime, default= datetime.utcnow)
+    es_spoiler = db.Column(db.Integer, nullable=False, default = 0)
+    c_borrado = db.Column(db.Integer, nullable=False, default = 0)      

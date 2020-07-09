@@ -7,39 +7,8 @@ import os, random
 from os import path
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import shutil, sys
-import dateutil.parser
-
-
-@app.template_filter('strftime')
-def _jinja2_filter_datetime(date, fmt=None):
-    date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=None)
-    format='%d-%m-%Y'
-    return native.strftime(format) 
-
-@app.template_filter('time')
-def _jinja2_filter_datetime(date, fmt=None):
-    date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=None)
-    format='%d-%m-%Y %H:%M:%S'
-    return native.strftime(format) 
-
-@app.route("/fechas", methods= ["GET", "POST"])
-def fechas():
-    if request.method == "POST":
-        users = Users.query.filter(Users.fecha_registro >= request.form["fecha1"]).filter(Users.fecha_registro <= request.form["fecha2"]).all()
-        if users:
-            return render_template("fechasEjemplo.html", users = users)
-        else:
-            flash("No hay usuarios suscritos entre estas fechas", "error")
-    return render_template("fechasEjemplo.html")
-@app.route("/borrarComentario/<int:n>/<int:m>")
-def borrarComentario(n,m):
-    comentario = valoracion.query.filter_by(id = n).delete()
-    db.session.commit()
-    flash("Se eliminó tu comentario", "success")
-    return redirect("/mostrarLibro/" + str(m))
+import shutil, sys                                                                                                                                                    
+import easygui as eg
 
 @app.route("/listarCapitulosUser/<int:LibroId>")
 def listarCapUser(LibroId):
@@ -53,6 +22,22 @@ def verPDF(LibroId):
     libro = Libros.query.filter_by(id=LibroId).first()
     capitulo = Capitulos.query.filter_by(lib_id=LibroId).first()
     pathF = capitulo.path + "\\" + capitulo.nomCap + "#toolbar=0"
+
+    # Guardar libro en Historial de ese perfil
+    if "perfilElegido" in session:
+        #Controlar que ese libro no este ya guardado en el historial de ese perfil
+        estaYaEnHistorial = False
+        historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for book in historial_perfilActual:
+            if (book.libro_id == LibroId):
+                estaYaEnHistorial = True
+
+        if not estaYaEnHistorial:
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+                                        libro_id = LibroId)
+            db.session.add(nuevo_historial)
+            db.session.commit()
+
     return render_template("vistaPDF.html", pathF = pathF)
 
 @app.route("/verCapitulo/<int:LibroId>/<int:cap>")
@@ -60,6 +45,27 @@ def verCapitulo(LibroId,cap):
     libro = Libros.query.filter_by(id=LibroId).first()
     capitulo = Capitulos.query.filter_by(lib_id=LibroId,numCap = cap).first()
     pathF = capitulo.path + "\\" + capitulo.nomCap + "\\"
+
+    # Guardar capítulo del libro en Historial de ese perfil
+    if "perfilElegido" in session:
+        # Si el libro ya está, actualizar solamente el capítulo
+        yaEnHistoriall = False
+        historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for book in historial_perfilActual:
+            if (book.libro_id == LibroId):
+                yaEnHistoriall = True
+                if (book.capitulo_id != cap):
+                    book.capitulo_id = cap
+                    db.session.commit()
+                    # Capitulo actualizado
+
+        if not yaEnHistoriall:
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+                                        libro_id = LibroId,
+                                        capitulo_id = cap)
+            db.session.add(nuevo_historial)
+            db.session.commit()
+
     return render_template("vistaPDF.html", pathF = pathF)
 
 @app.route("/hora")
@@ -99,6 +105,15 @@ def mostrarLibro(n):
     else:
         trailerL = ""
 
+     yaEnFavoritos = False
+    if "perfilElegido" in session:
+        favoritos_delPerfil = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
+        for libro_fav in favoritos_delPerfil:
+            if libro_fav.favorito_borrado == "False":
+                libroAct = Libros.query.filter_by(id=libro_fav.libro_id).first()
+                if libroAct.titulo == libro.titulo:
+                    yaEnFavoritos = True
+
     if request.method == "POST":
         if ("rating" in request.form):
             nue_com = valoracion(lib_id = n, perfil_id = session["perfilElegido"], puntuacion = request.form['rating'],comentario = request.form['comentario'], fecha_valoracion = datetime.now())
@@ -113,11 +128,11 @@ def mostrarLibro(n):
             if tot != 0:
                 prom = prom / tot
 
-            return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom)
+            return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
         else:
             flash("No se seleccionó una valoracion", "error")
     
-    return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom)
+    return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
 
 
 @app.route("/borrarLibro/<int:n>", methods= ["GET", "POST"])
@@ -592,7 +607,7 @@ def signup_standard():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if "usermail" in session:
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
         user = Users.query.filter_by(correo=request.form["correo_login"]).first()
@@ -619,29 +634,32 @@ def login():
 @app.route("/p", methods=["GET", "POST"])
 def elige_un_perfil():
     if "usermail" in session:
-        elmail = session["usermail"]
-        us = Users.query.filter_by(correo=elmail).first() # Obtiene el usuario a buscar sus perfiles
-        #2) Filtrar elementos que coincidan: el usuario_id de la tabla perfiles con el id del usuario logueado
-        lista = Perfiles.query.filter_by(usuario_id=us.id).all() # se obtienen todos los perfiles del usuario logueado
-        perfiles = []
-        for profileee in lista:
+        if not ("perfilElegido" in session):
+            elmail = session["usermail"]
+            us = Users.query.filter_by(correo=elmail).first() # Obtiene el usuario a buscar sus perfiles
+            #2) Filtrar elementos que coincidan: el usuario_id de la tabla perfiles con el id del usuario logueado
+            lista = Perfiles.query.filter_by(usuario_id=us.id).all() # se obtienen todos los perfiles del usuario logueado
+            perfiles = []
+            for profileee in lista:
 
-            if (profileee.perfil_borrado == "False"):
+                if (profileee.perfil_borrado == "False"):
 
-                dic = {"profile_img": " ", "nombre_de_perfil": " ", "id_de_perfil": 0}
+                    dic = {"profile_img": " ", "nombre_de_perfil": " ", "id_de_perfil": 0}
 
-                dic["nombre_de_perfil"] = profileee.nombre_perfil
-                dic["profile_img"] = profileee.imagen_de_perfil
-                dic["id_de_perfil"] = profileee.id
+                    dic["nombre_de_perfil"] = profileee.nombre_perfil
+                    dic["profile_img"] = profileee.imagen_de_perfil
+                    dic["id_de_perfil"] = profileee.id
 
-                perfiles.append(dic)
-        # Se creó la lista de diccionarios con los perfiles del usuario
+                    perfiles.append(dic)
+            # Se creó la lista de diccionarios con los perfiles del usuario
 
-        if request.method == "POST":
-            session["perfilElegido"] = request.form["id_del_perfil_elegido"]
+            if request.method == "POST":
+                session["perfilElegido"] = request.form["id_del_perfil_elegido"]
+                return redirect(url_for("index"))
+
+            return render_template("eligeUnPerfil.html", perfiles=perfiles)
+        else:
             return redirect(url_for("index"))
-
-        return render_template("eligeUnPerfil.html", perfiles=perfiles)
 
     flash("Debes iniciar sesion primero", "error")
     return redirect(url_for("login"))
@@ -652,7 +670,8 @@ def logout():
     if "usermail" in session:
         session.pop("usermail", None) # Cierra la sesión
         session.pop("tipoUser", None)
-        session.pop("perfilElegido", None)
+        if "perfilElegido" in session:
+            session.pop("perfilElegido", None)
         flash ("Ha cerrado la sesión con éxito.", "success_logout")
         return redirect(url_for("index"))
 
@@ -668,7 +687,36 @@ def index():
         if "perfilElegido" in session:
             libros = Libros.query.filter_by(oculto=0).all()
             perfilActual = Perfiles.query.filter_by(id=session["perfilElegido"]).first()
-            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual)
+            favoritos_perfilActual = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
+            l = []
+            for libro_favorito in favoritos_perfilActual:
+                if libro_favorito.favorito_borrado == "False":
+                    libro = Libros.query.filter_by(id=libro_favorito.libro_id).first()
+                    dic = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_fav": 0}
+
+                    dic["id_fav"] = libro_favorito.id
+
+                    dic["titulo_libro"] = libro.titulo
+                    dic["cantidad_de_capitulos"] = libro.cantCapTotales
+                    dic["id_libro"] = libro.id
+
+                    l.append(dic)
+
+            #Buscar el historial de ese perfil
+            historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
+            libros_historial = []
+            for libroHist in historial_perfilActual:
+                libroHistorial = Libros.query.filter_by(id=libroHist.libro_id).first()
+                dicHist = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_capitulo": 0}
+                dicHist["titulo_libro"] = libroHistorial.titulo
+                dicHist["cantidad_de_capitulos"] = libroHistorial.cantCapTotales
+                dicHist["id_libro"] = libroHistorial.id
+                if libroHistorial.capSubidosAct > 1:
+                    dicHist["id_capitulo"] = libroHist.capitulo_id
+
+                libros_historial.append(dicHist)
+
+            return render_template("vistaUserRegistrado.html", libros=libros, perfilActual=perfilActual, l=l, libros_historial=libros_historial)
         else:
             return redirect(url_for("elige_un_perfil"))
     else:
@@ -712,6 +760,8 @@ def borrar_def():
 
         session.pop("usermail", None) # Cierra la sesión
         session.pop("tipoUser", None)
+        if "perfilElegido" in session:
+            session.pop("perfilElegido", None)
 
         flash("Tu cuenta ha sido cerrada satisfactoriamente", "success_deleted_account")
         return redirect(url_for("index"))
@@ -961,6 +1011,48 @@ def modificando_perfil():
     return redirect(url_for("login"))
 
 
+@app.route("/agregandoFavorito", methods=['POST', 'GET'])
+def agregar_a_favoritos():
+    if "usermail" in session:
+        if request.method == 'POST':
+            if "perfilElegido" in session:
+                nuevo_favorito = Favoritos(perfil_id = session["perfilElegido"],
+                                           libro_id = request.form["id_del_libro_elegido_para_favoritos"],
+                                           favorito_borrado = "False")
+
+                db.session.add(nuevo_favorito)
+                db.session.commit()
+
+                flash("Libro agregado a favoritos con éxito", "success")
+                return redirect(url_for("index"))
+            else:
+                return redirect(url_for("elige_un_perfil"))
+
+        else:
+            return redirect(url_for("index"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/quitandoFavorito", methods=['POST', 'GET'])
+def quitar_favorito():
+    if "usermail" in session:
+        if request.method == 'POST':
+            favorito_a_quitar = Favoritos.query.filter_by(id=request.form['id_favorito_a_quitar']).first()
+            favorito_a_quitar.favorito_borrado = "True"
+
+            db.session.commit()
+
+            flash("Libro quitado de favoritos con éxito", "success")
+            return redirect(url_for("index"))
+        else:
+            return redirect(url_for("index"))
+
+    flash("Debes loguearte primero para acceder a esta sección", "error")
+    return redirect(url_for("login"))
+
+
 @app.route("/modificarSuscripcion", methods=['POST', 'GET'])
 def modificar_suscripcion():
     if "usermail" in session:
@@ -1161,13 +1253,61 @@ def search():
         tag = request.form["book"]
         search = "%{}%".format(tag)
         libro = Libros.query.filter(Libros.titulo.ilike(search)).all()
-        autor = Autores.query.filter(Autores.nomAutor.ilike(search)).first()
+        autor = Autores.query.filter(Autores.nomAutor.ilike(search)).all()
         genero = Generos.query.filter(Generos.nomGenero.ilike(search)).first()
         if (autor != None):
-            librosAut = Libros.query.filter_by(autor_id=autor.id).all()
+            librosAut = []
+            for i in autor:
+                lib = (Libros.query.filter_by(autor_id=i.id).all())
+                librosAut.append([lib, i])  
             return render_template("busqueda.html", autor=autor, librosAut=librosAut, genero=genero, libro= libro)
-        elif genero != None:
+        elif (genero != None):
             librosGen = Libros.query.filter_by(genero_id=genero.id).all()
             return render_template("busqueda.html", genero=genero, librosGen=librosGen, autor=autor, libro=libro )
         else:
             return render_template("busqueda.html", libro=libro, genero=genero, autor=autor)
+
+@app.route("/searchA/<string:s>")
+def searchA(s):
+    search = "%{}%".format(s)
+    autor = Autores.query.filter(Autores.nomAutor.ilike(search)).all()
+    librosAut = []
+    for i in autor:
+        lib = (Libros.query.filter_by(autor_id=i.id).all())
+        librosAut.append([lib, i])  
+    return render_template("busqueda.html", autor=autor, librosAut=librosAut, genero=genero, libro= libro)
+
+@app.route("/verComentariosAdm")
+def verComentariosAdm():
+    comentarios = Valoracion.query.order_by(Valoracion.fecha_valoracion.desc()).all()
+    lista = []
+    for i in comentarios:
+        lib = (Libros.query.filter_by(id=i.lib_id).first())
+        lista.append([lib, i])
+    return render_template("verComentariosAdm.html", lista=lista)
+
+@app.route("/borrarComentario/<int:id>")
+def borrarComentario(id):
+    comentario_a_borrar = Valoracion.query.get_or_404(id)
+    comentario_a_borrar.comentario = ""
+    comentario_a_borrar.c_borrado = 1
+    db.session.commit()
+    flash ("comentario borrado con exito", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/marcarSpoiler/<int:id>")    
+def marcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 1
+    db.session.commit()
+    flash ("Comentario marcado como spoiler", "success")
+    return redirect('/verComentariosAdm')
+
+@app.route("/desmarcarSpoiler/<int:id>")    
+def desmarcarSpoiler(id):
+    comentarioS = Valoracion.query.get_or_404(id)
+    comentarioS.es_spoiler = 0
+    db.session.commit()
+    flash ("Comentario desmarcado", "success")
+    return redirect('/verComentariosAdm')    
+                    
