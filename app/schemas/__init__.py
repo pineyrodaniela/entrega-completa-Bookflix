@@ -33,6 +33,12 @@ class Favoritos(db.Model):
     libro_id = db.Column(db.Integer, nullable=False)
     favorito_borrado = db.Column(db.String(5), nullable=False)
 
+class Historial(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    perfil_id = db.Column(db.Integer, nullable=False)
+    libro_id = db.Column(db.Integer, nullable=False)
+    capitulo_id = db.Column(db.Integer, nullable=True)
+
 class Libros(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     titulo = db.Column(db.String(50))
