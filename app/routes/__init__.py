@@ -7,8 +7,43 @@ import os, random
 from os import path
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import shutil, sys                                                                                                                                                    
-import easygui as eg
+import shutil, sys   
+import dateutil.parser
+from sqlalchemy import desc
+
+
+
+@app.template_filter('strftime')
+def _jinja2_filter_datetime(date, fmt=None):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    format='%d-%m-%Y'
+    return native.strftime(format) 
+
+@app.template_filter('time')
+def _jinja2_filter_datetime(date, fmt=None):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    format='%d-%m-%Y %H:%M:%S'
+    return native.strftime(format) 
+
+@app.route("/fechas", methods= ["GET", "POST"])
+def fechas():
+    if request.method == "POST":
+        users = Users.query.filter(Users.fecha_registro >= request.form["fecha1"]).filter(Users.fecha_registro <= request.form["fecha2"]).all()
+        if users:
+            return render_template("fechasEjemplo.html", users = users)
+        else:
+            flash("No hay usuarios suscritos entre estas fechas", "error")
+    return render_template("fechasEjemplo.html")
+
+@app.route("/borrarComentarioUser/<int:n>/<int:m>")
+def borrarComentarioUser(n,m):
+    comentario = Valoracion.query.filter_by(id = n).delete()
+    db.session.commit()
+    flash("Se eliminó tu comentario", "success")
+    return redirect("/mostrarLibro/" + str(m))
+
 
 @app.route("/listarCapitulosUser/<int:LibroId>")
 def listarCapUser(LibroId):
@@ -33,7 +68,7 @@ def verPDF(LibroId):
                 estaYaEnHistorial = True
 
         if not estaYaEnHistorial:
-            nuevo_historial = Historial(perfil_id = session["perfilElegido"],
+            nuevo_historial = Historial(perfil_id = session["perfilElegido"], capitulo_id = 1,
                                         libro_id = LibroId)
             db.session.add(nuevo_historial)
             db.session.commit()
@@ -52,12 +87,11 @@ def verCapitulo(LibroId,cap):
         yaEnHistoriall = False
         historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
         for book in historial_perfilActual:
-            if (book.libro_id == LibroId):
+            if (book.capitulo_id == cap and book.libro_id == LibroId):
                 yaEnHistoriall = True
-                if (book.capitulo_id != cap):
-                    book.capitulo_id = cap
-                    db.session.commit()
-                    # Capitulo actualizado
+                book.capitulo_id = cap
+                db.session.commit()
+                # Capitulo actualizado
 
         if not yaEnHistoriall:
             nuevo_historial = Historial(perfil_id = session["perfilElegido"],
@@ -82,7 +116,7 @@ def hora():
 
 @app.route("/mostrarLibro/<int:n>", methods= ["GET", "POST"])
 def mostrarLibro(n):
-    valoraciones = valoracion.query.filter_by(lib_id=n).all()
+    valoraciones = Valoracion.query.filter_by(lib_id=n).order_by(desc(Valoracion.fecha_valoracion)).all()
     
     prom = 0
     tot = 0
@@ -99,13 +133,15 @@ def mostrarLibro(n):
     edit = Editoriales.query.filter_by(id = libro.editorial_id).first()
     gen = Generos.query.filter_by(id = libro.genero_id).first()
     datetime_act = datetime.now()
+    historial = Historial.query.filter(Historial.perfil_id == int(session["perfilElegido"])).filter(Historial.libro_id == n).all()
+    valPerfilAct = Valoracion.query.filter(Valoracion.lib_id==n).filter(Valoracion.id == int(session["perfilElegido"]) ).all()
 
     if libro.tiene_trailer:
         trailerL = trailers.query.filter_by(libro_id=libro.id).first()
     else:
         trailerL = ""
 
-     yaEnFavoritos = False
+    yaEnFavoritos = False
     if "perfilElegido" in session:
         favoritos_delPerfil = Favoritos.query.filter_by(perfil_id=session["perfilElegido"]).all()
         for libro_fav in favoritos_delPerfil:
@@ -116,11 +152,12 @@ def mostrarLibro(n):
 
     if request.method == "POST":
         if ("rating" in request.form):
-            nue_com = valoracion(lib_id = n, perfil_id = session["perfilElegido"], puntuacion = request.form['rating'],comentario = request.form['comentario'], fecha_valoracion = datetime.now())
+            nue_com = Valoracion(lib_id = n, perfil_id = session["perfilElegido"], puntuacion = request.form['rating'],comentario = request.form['comentario'], fecha_valoracion = datetime.now(), es_spoiler = 0, c_borrado = 0)
             db.session.add(nue_com)
             db.session.commit()
             flash("Comentario publicado", "success")
-            valoraciones = valoracion.query.filter_by(lib_id=n).all()
+            valoraciones = Valoracion.query.filter_by(lib_id=n).order_by(desc(Valoracion.fecha_valoracion)).all()
+            valPerfilAct = Valoracion.query.filter(Valoracion.lib_id==n).filter(Valoracion.id == int(session["perfilElegido"]) ).all()
 
             for p in valoraciones:
                 prom = prom + p.puntuacion
@@ -128,11 +165,11 @@ def mostrarLibro(n):
             if tot != 0:
                 prom = prom / tot
 
-            return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
+            return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos, historial = historial, valPerfilAct = valPerfilAct)
         else:
             flash("No se seleccionó una valoracion", "error")
     
-    return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos)
+    return render_template("mostrarLibro.html", l =libro, c = capitulos, aut = aut, edit = edit, gen = gen, trailerL = trailerL, datetime_act = datetime_act, valoraciones = valoraciones, traerPer = traerPer, prom = prom, yaEnFavoritos=yaEnFavoritos, historial = historial, valPerfilAct = valPerfilAct)
 
 
 @app.route("/borrarLibro/<int:n>", methods= ["GET", "POST"])
@@ -703,13 +740,14 @@ def index():
                     l.append(dic)
 
             #Buscar el historial de ese perfil
+            Caps = Capitulos.query.all()
             historial_perfilActual = Historial.query.filter_by(perfil_id=session["perfilElegido"]).all()
             libros_historial = []
             for libroHist in historial_perfilActual:
                 libroHistorial = Libros.query.filter_by(id=libroHist.libro_id).first()
                 dicHist = {"titulo_libro": " ", "cantidad_de_capitulos": 0, "id_libro": 0, "id_capitulo": 0}
                 dicHist["titulo_libro"] = libroHistorial.titulo
-                dicHist["cantidad_de_capitulos"] = libroHistorial.cantCapTotales
+                dicHist["cantidad_de_capitulos"] = Caps[libroHist.capitulo_id-1].numCap
                 dicHist["id_libro"] = libroHistorial.id
                 if libroHistorial.capSubidosAct > 1:
                     dicHist["id_capitulo"] = libroHist.capitulo_id

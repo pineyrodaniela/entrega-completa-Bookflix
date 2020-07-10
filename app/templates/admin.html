@@ -53,28 +53,59 @@
 
 
         <div class="collapse navbar-collapse" id="barraMenu">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/cargarLibro">Agregar Libro</a>
+          <ul class="navbar-nav">
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="Libros" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Libros
+              </a>
+              <div class="dropdown-menu" aria-labelledby="Libros">
+                <a style="color: black;" class="nav-link" href="/traerLibros">Listar Libros</a>
+                <a style="color: black;" class="nav-link" href="/cargarLibro">Agregar Libro</a>
+              </div>
             </li>
+
+
+
             <li class="nav-item">
               <a class="nav-link" href="/darDeAlta">Dar De Alta</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/traerLibros">Listar Libros</a>
-            </li>
+
             <li class="nav-item">
               <a class="nav-link" href="/novedadesAdm">Novedades</a>
             </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="Trailers" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Trailers
+              </a>
+              <div class="dropdown-menu" aria-labelledby="Trailers">
+                <a style="color: black;" class="nav-link" href="/agregarTrailer">Agregar Trailers</a>
+                <a style="color: black;" class="nav-link" href="/BorrarTrailersAdm">Quitar Trailers</a>
+              </div>
+            </li>
+
+
+
             <li class="nav-item">
-              <a class="nav-link" href="/agregarTrailer">Agregar Trailers</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/BorrarTrailersAdm">Quitar Trailers</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/verComentariosAdm">Listar comentarios</a>
             </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="Estadisticas" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Estadisticas
+              </a>
+              <div class="dropdown-menu" aria-labelledby="Estadisticas">
+                <a style="color: black;" class="nav-link" href="/fechas">Usuarios registrados</a>
+                <a style="color: black;" class="nav-link" href="">Sin usar</a>
+              </div>
+            </li>
+
+
             <li class="nav-item">
               <a class="nav-link" href="/logout">Cerrar Sesion</a>
             </li>

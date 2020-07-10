@@ -29,6 +29,7 @@
             <h6>Editorial: {{edit.nomEditorial}}</h6><br>
             
             <h6>Cantidad de paginas: {{c.cantidad_de_paginas}}</h6>
+
                     
         </div>
         <div style="margin-left: 10%; margin-top: 13%;" >
@@ -98,7 +99,9 @@
       <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
         <!-- comienzo de comentarios-->
 
-        <!-- agregar condicional para los perfiles que ya comentaron --->
+        <!-- comentario y puntuacion --->
+        {% if historial|length == l.cantCapTotales and not valPerfilAct|length %}
+
             <h4 style="text-align: center;">¿Qué te pareció el libro?</h4>
         
         <form name="ratingLibro" method="POST" class="agLib">
@@ -115,7 +118,7 @@
                 </div>
                 </div>
             </div>   
-
+        <!-- comentario y puntuacion fin --->
     
         <div class="col-lg-6 col-lg-offset-4; form-group">
             
@@ -124,6 +127,9 @@
 
           <button type="submit" style="margin-left: 43%;" class="btn btn-success"> Valorar</button>
         </form>
+          {% elif historial|length != l.cantCapTotales %}
+            <h3>Aun no puedes comentar. Termina de leer el libro</h3>
+          {% endif %}
 
 
 
@@ -147,7 +153,7 @@
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                  <a href="/borrarComentario/{{v.id}}/{{l.id}}" idCom ="{{v.id}}" class="btn btn-danger" role="button" >Confirmar</a>
+                                  <a href="/borrarComentarioUser/{{v.id}}/{{l.id}}" idCom ="{{v.id}}" class="btn btn-danger" role="button" >Confirmar</a>
                                 </div>
                               </div>
                             </div>
@@ -168,18 +174,18 @@
                                     {% if v.es_spoiler == 0 or v.perfil_id == session["perfilElegido"]|int %}
                                       <span class="m-b-15 d-block">{{v.comentario}}
                                         {% if v.perfil_id == session["perfilElegido"]|int %}
-                                        <button idCom ="{{v.id}}" libId={{l.id}} class="btn btn-danger btn-sm xd2" style="float: right;">Borrar comentario</button>
+                                        <button idCom ="{{v.id}}" libId={{l.id}} class="btn btn-danger btn-sm xd2" style="margin-left: 2%; float: right;">Borrar comentario</button>
                                         {% endif %} 
                                       </span>
                                     {% else %}
                                       <span class="m-b-15 d-block"><details><summary><b>Este comentario tiene spoiler.</b></summary>{{v.comentario}}</details>
                                         {% if v.perfil_id == session["perfilElegido"]|int %}
-                                        <button idCom ="{{v.id}}" libId={{l.id}} class="btn btn-danger btn-sm xd2" style="float: right;">Borrar comentario</button>
+                                        <button idCom ="{{v.id}}" libId={{l.id}} class="btn btn-danger btn-sm xd2" style="margin-left: 2%; float: right;">Borrar comentario</button>
                                         {% endif %} 
                                       </span>
                                     {% endif %}
 
-                                    <div class="comment-footer"> <span class="text-muted float-right">{{v.fecha_valoracion}}</span></div>
+                                    <div class="comment-footer"> <span class="text-muted float-right">{{ v.fecha_valoracion|time }}</span></div>
                                 </div>
                             </div> <!-- Comment Row -->
                         </div> <!-- Card -->
