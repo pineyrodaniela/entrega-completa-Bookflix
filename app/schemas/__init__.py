@@ -96,19 +96,13 @@ class trailers(db.Model):
     libro_id = db.Column(db.Integer, nullable=True)
     file = db.Column(db.String)
 
-class Historial(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    perfil_id = db.Column(db.Integer, nullable=False)
-    libro_id = db.Column(db.Integer, nullable=False)
-    capitulo_id = db.Column(db.Integer, nullable=True)
-
 class Valoracion(db.Model):
     id = db.Column(db.Integer, primary_key= True)
     lib_id = db.Column(db.Integer, nullable= False)
-    user_id = db.Column(db.Integer, nullable= False)
+    user_id = db.Column(db.Integer)
     perfil_id = db.Column(db.Integer, nullable= False)
     puntuacion = db.Column(db.Integer)
     comentario = db.Column(db.String(500))
-    fecha_valoracion = db.Column(db.DateTime, default= datetime.utcnow)
+    fecha_valoracion = db.Column(db.String(10), default= datetime.utcnow)
     es_spoiler = db.Column(db.Integer, nullable=False, default = 0)
     c_borrado = db.Column(db.Integer, nullable=False, default = 0)      
